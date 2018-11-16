@@ -1,10 +1,10 @@
 <?php
-	
+
 	require_once "objects/Node.php";
 	require_once "functions/common_functions.php";
 	require_once "functions/repo_scan_functions.php";
 	require_once "functions/database_functions.php";
-	require_once 'vendor/autoload.php';
+	require_once "vendor/autoload.php";
 
 
 	use GraphAware\Neo4j\Client\ClientBuilder;
@@ -13,6 +13,9 @@
 
 	$repoPath = "/home/thoums/Documents/www/PHP/X_test_repo";
 	$repoName = "X_test_repo";
+
+	//$repoPath = "/home/thoums/Documents/www/PHP/Stage_Redspĥer/Sujet_1/application_modeling_2.0";
+	//$repoName = "application_modeling_2.0";
 
 
 	$timestamp_start = microtime(true); //Just to mesure running time
@@ -26,10 +29,11 @@
 	}
 	catch (Exception $e) {
 		echo "Exception while scanning directory : ".$e->getMessage();
+		exit;
 	}
 	$files = keepSpecificTypesOnly($files, array(".php"));
 	
-	
+	displayArray($files);
 	
 	
 	//Connexion to database + clear
@@ -82,27 +86,27 @@
 		create relationsships in database.
 	*/
 	foreach ($nodes as $node) {
-		echo $node->getPath()."<br>";
+		//echo $node->getPath()."<br>";
 
 		$includeQuery = $node->generateIncludeRelationQuery();
 		if ($includeQuery) {
-			echo $includeQuery."<br>";
+			//echo $includeQuery."<br>";
 			runQuery($client, $includeQuery);
 		}
 
 		$requireQuery = $node->generateRequireRelationQuery();
 		if ($requireQuery) {
-			echo $requireQuery."<br>";
+			//echo $requireQuery."<br>";
 			runQuery($client, $requireQuery);
 		}
 
-		echo "<br><br>";
+		//echo "<br><br>";
 	}
 
 
 
 
-	echo "<br>Done.<br>";
+	echo "<br>Done.";
 
 
 	echo "<br><br>";

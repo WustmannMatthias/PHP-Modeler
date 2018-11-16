@@ -410,6 +410,9 @@
 
 
 
+
+
+
 		/*******************************************************************************
 		********************************************************************************
 		****************************** QUERY * GENERATION ******************************
@@ -467,23 +470,20 @@
 
 			$includeRelation = "IS_INCLUDED_BY";
 
-			$path = $this->getPathFromRepo($this->_path, $this->_repoName);
-			$query = "MATCH (ni:File {path: '".$path."'}) " ;
+			$path 		= $this->getPathFromRepo($this->_path, $this->_repoName);
+			$queryBegin = "MATCH (ni:File {path: '".$path."'}) " ;
+			$queryEnd	= "";
 
 			$iCounter = 0;
 			foreach ($this->_includes as $include) {
 				$includePath = $this->getPathFromRepo($include, $this->_repoName);
 				$iCounter ++;
-				$query .= "MATCH (ni".$iCounter.":File {path: '$includePath'}) ";
-			}
-
-			$iCounter = 0;
-			foreach ($this->_includes as $include) {
-				$includePath = $this->getPathFromRepo($include, $this->_repoName);
-				$iCounter ++;
-				$query .= "CREATE (ni".$iCounter.")-[ri".$iCounter.":".$includeRelation
+				$queryBegin .= "MATCH (ni".$iCounter.":File {path: '$includePath'}) ";
+				$queryEnd 	.= "CREATE (ni".$iCounter.")-[ri".$iCounter.":".$includeRelation
 						."]->(ni) ";
 			}
+
+			$query = $queryBegin.$queryEnd;
 			return $query;
 		}
 
@@ -502,26 +502,37 @@
 
 			$requireRelation = "IS_REQUIRED_BY";
 
-			$path = $this->getPathFromRepo($this->_path, $this->_repoName);
-			$query = "MATCH (nr:File {path: '".$path."'}) " ;
+			$path 		= $this->getPathFromRepo($this->_path, $this->_repoName);
+			$queryBegin = "MATCH (nr:File {path: '".$path."'}) " ;
+			$queryEnd	= "";
 
 			$rCounter = 0;
 			foreach ($this->_requires as $require) {
 				$requirePath = $this->getPathFromRepo($require, $this->_repoName);
 				$rCounter ++;
-				$query .= "MATCH (nr".$rCounter.":File {path: '$requirePath'}) ";
-			}
-
-			$rCounter = 0;
-			foreach ($this->_requires as $require) {
-				$requirePath = $this->getPathFromRepo($require, $this->_repoName);
-				$rCounter ++;
-				$query .= "CREATE (nr".$rCounter.")-[rr".$rCounter.":".$requireRelation
+				$queryBegin .= "MATCH (nr".$rCounter.":File {path: '$requirePath'}) ";
+				$queryEnd .= "CREATE (nr".$rCounter.")-[rr".$rCounter.":".$requireRelation
 						."]->(nr) ";
 			}
 
+			$query = $queryBegin.$queryEnd;
 			return $query;
 		}
+
+
+
+
+
+
+		/*******************************************************************************
+		********************************************************************************
+		********************************** ACCESSORS ***********************************
+		********************************************************************************
+		*******************************************************************************/
+
+
+
+
 
 
 		/**
@@ -568,6 +579,12 @@
 		public function getUses() {
 			return $this->_uses;
 		}
+
+
+
+
+
+
 
 		/**
 			toString descriptive method

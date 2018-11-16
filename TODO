@@ -92,9 +92,19 @@ But : Pour n'importe quel fichier modifié, on doit pouvoir parcourir les relati
 
 
 
+
+
+
+ETAPE 3 : Revisiter l'architecture du programme.
+Comme expliquer dans le fichier subject.odt, il fallait revisiter la classe Node afin qu'elle stocke tous les éléments essentiels du programme dans ses attributs.
+
+
+
+
+
 PROJETS
 
-- Améliorer le code qui parcours les fichiers à la recherche d'include et de variables : structure en arbre pour le parcourir plus rapidement
+- Améliorer le code qui parcours les fichiers à la recherche d'include et de variables : structure en arbre pour le parcourir plus rapidement (OK -> etape 3)
 - Récupérer directement le repo depuis github
 - Lors de requêtes SQL vers une base, modéliser les relations entre les fichiers et cette base de données
 - Ajouter les features à la modélisation (but premier)
