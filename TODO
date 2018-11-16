@@ -1,0 +1,114 @@
+
+
+ETAPE 1 : Créer un graph à partir d'un repo. (OK !)
+
+But : à partir d'un dossier, être capable de créer un graph représentant tous les fichier ainsi que toutes les relations entre ces fichiers.
+
+
+
+
+1) Ecrire une fonction qui récupère récursivement le nom entier de tous les fichiers d'un dossier (avec chemin d'accès) (OK)
+	Ne garder que les fichiers PHP. (OK)
+
+2) Créer une classe Node, dont les objets seront les noeuds du graph. 
+Cette classe aura comme attribut les propriétés que devront avoir les noeuds du graph. (OK)
+Constructeur : 
+	prend comme paramètre le chemin d'accès au fichier, et sera capable de remplir les autres propriétés. (OK)
+Methodes : 
+	- Générer une requête Cypher qui ajoutera le noeud à la base (OK)
+	- Retourner les lignes qui comportent des include ou require (OK)
+	- En déduire les chemins d'accès complets des fichiers inclus (OK)
+		DIFFICULTES : 
+			- Le fichier peut être inclu par include, require, include_once ou require_once
+			- Des parenthèses peuvent (ou non) être utilisées -> require fichier.php = require(fichier.php)
+			- Le chemin peut être aboslu ou relatif
+			- Des variables ou constantes peuvent être (ou non) utilisées pour inclure les fichiers
+			- Ces variables ou constantes peuvent valoir l'intégralité du chemin d'accès vers le fichier ou seulement une partie
+			- Dans un fichier lui même inclu dans un autre, le chemin d'accès (si relatif) est relatif au parent et non au fichier lui même
+		SOLUTIONS / STRATEGIE D'IDENTIFICATION DES DEPENDANCES : 
+			- On parcours le fichier ligne à ligne. Pour chaque ligne : 
+			- Si le code php de la ligne commence par include ou require, il y a une dépendence. On garde la ligne : 
+				- On recherche la présence de variable dans cette ligne. Si il y en a : 
+					- Identification du nom de la variable
+					- Identification de la valeur de la variable en reparcourant le fichier, à la recherche de la déclaration de la variable
+					- Dans la ligne, on remplace la variable par a valeur et on l'entoure de guillemets. 
+				- On élimine tout ce qui n'est pas entouré de simple ou doubles quotes (statements include, parenthèses, guillets, opérateurs de concaténation)
+				- On remplace les parties ../ et ./ du path par les noms de dossiers correspondant.
+	- Générer une requête qui identifiera ces fichiers, et créera une relation avec dans la base (OK)
+
+
+3) Créer un programme qui créera la base de données
+	- Créer une base de données neo4j et s'y connecter (OK)
+	- Analyser un repo et créer un objet Node pour chaque repo (OK)
+	- Créer tous les Nodes dans la base (OK)
+	- Identifier toutes les inclusions entre les fichiers et les créer dans la base de données (OK)
+
+
+Améliorations de l'étape 1 à faire avant de continuer : 
+- Réfléchir à séparer les fonctions d'aide à getDependencies() de la classe Node (OK -> mauvaise idée)
+- Rendre la date de modification des fichiers humainement compréhensible (OK)
+- Améliorer un peu l'architecture du repo (OK)
+- Distinguer les include des require dans la modélisation (OK)
+- Avancer un peu dans le rapport (OK)
+- Indiquer le path par rapport au repo et non par rapport à la racine du système hôte (OK)
+
+
+
+
+
+
+
+
+
+
+ETAPE 2 : Ajouter les features au graph
+
+Il va ici s'agir de trouver les fichiers en tête de l'arborescence des dépendences. Ces fichiers devront être reliés à une ou plusieurs features. 
+
+But : Pour n'importe quel fichier modifié, on doit pouvoir parcourir les relations du graph, trouver tous les fichiers dans lesquels ce fichier est inclu, et finalement identifier toutes les features potentiellement impactées par ce fichier.
+
+
+--> PHASE DE TEST
+1) Créer un nouveau programme. Il doit pouvoir se connecter à la base de données, et renvoyer la liste des fichiers qui ne sont inclus dans aucun autre fichier. (OK)
+	- Depuis le repo de test, identifier à l'aide de ce programme l'ensemble des fichiers auquel il faut associer une feature (OK)
+		-> Ecrire une requête qui sort tous les noeuds qui ne pointent vers aucun autre noeuds avec une relation IS_INCLUDED_IN ni IN_REQUIRED_IN. (OK)
+	- Imaginer une syntaxe à inscrire dans l'en-tête de chacun de ces fichiers afin d'annoter rapidement et clairement leur(s) feature(s) (OK)
+	- Annoter ainsi les fichiers (OK)
+	=> Ce programme ne sera utile qu'une fois. Il permettra aux developpeurs de savoir quels fichiers annoter. Une fois les fichiers annotés, il faudra prendre 
+		l'habitude d'annoter chaque nouveau fichier, afin d'être toujours à jour au niveau des liens fichier->feature.
+
+
+2) Dans le programme initial index.php :
+	- ajouter dans la première boucle (celle qui envoie les fichiers sans relations dans la base) l'envoie d'un noeud par feature dans la base (ANNULE)
+	- ajouter dans cette même boucle l'envoie des relations entre les fichiers et leur(s) feature(s) dans la base (ANNULE)
+	COMMENT FAIRE ?
+		- Dans la classe Node.php, ajouter un attribut features de type array qui stockera les features impactées par ce fichier (OK)
+		- Préparer une méthode qui génèrera une requête d'ajout d'un noeud par feature, puis une requête d'ajoute de toutes les relations entre le fichier et ses features (ANNULE)
+	Autre solution : 
+		-> Dans le constructeur de Node, ajouter une méthode qui parcours les fichiers et va récupérer la liste des features listéees en commentaire au début de ces derniers. (OK)
+		-> Dans la méthode generateUploadQuery, qui jusqu'ici ajoutait uniquement les noeuds sans relation, ajouter l'envoi des features dans la base de données, ainsi que les relations entre
+			les fichiers et leur features. (OK)
+
+
+
+
+PROJETS
+
+- Améliorer le code qui parcours les fichiers à la recherche d'include et de variables : structure en arbre pour le parcourir plus rapidement
+- Récupérer directement le repo depuis github
+- Lors de requêtes SQL vers une base, modéliser les relations entre les fichiers et cette base de données
+- Ajouter les features à la modélisation (but premier)
+- Ajouter les releases à la modélisation (Node : propriétés : date de début / fin, repo, et si la release est déployée ou non ou date de déploiement ?? Les nodes release pointeront par exemple sur les fichiers qui ont été modifiés durant l'itération) --> A REFLECHIR
+
+
+
+
+
+AUTRE ETAPES : 
+Créer un programme qui proposera des requêtes génériques :
+	- Sortir les fichiers modifiés entre telle et telle date
+	- Sortir tous les fichiers impactés par tel fichier 
+	- etc ???
+
+
+
