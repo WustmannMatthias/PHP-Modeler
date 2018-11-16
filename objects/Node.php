@@ -371,7 +371,7 @@
 		*/
 		private function extractNamespace($line) {
 			$line = substr($line, 0, strlen($line) - 1);
-			return trim(str_replace("namespace", "", $line));
+			return trim(str_replace("namespace ", "", $line));
 		}
 
 		/**
@@ -381,7 +381,7 @@
 		*/
 		private function extractUses($line) {
 			$line = substr($line, 0, strlen($line) - 1);
-			return trim(str_replace("use", "", $line));
+			return trim(str_replace("use ", "", $line));
 		}
 
 
