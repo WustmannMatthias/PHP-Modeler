@@ -11,10 +11,7 @@
 
 
 
-	//$repoPath = "/home/thoums/Documents/www/PHP/X_test_repo";
-	//$repoName = "X_test_repo";
-
-	$repoPath = "/home/wustmann/Documents/X_test_repo";
+	$repoPath = "/home/thoums/Documents/www/PHP/X_test_repo";
 	$repoName = "X_test_repo";
 
 
@@ -38,7 +35,7 @@
 	
 	//Connexion to database + clear
 	$client = ClientBuilder::create()
-	    ->addConnection('bolt', 'bolt://neo4j:password@10.8.1.97:7687')
+	    ->addConnection('bolt', 'bolt://neo4j:password@localhost:7687')
 	    ->build();
 	runQuery($client, "MATCH (n)-[r]->(n2) DELETE r, n, n2");
 	runQuery($client, "MATCH (n) DELETE n");
@@ -80,7 +77,6 @@
 		displayArray($node->getUses());
 		*/
 
-		/*
 
 		//Send node in database
 		$query = $node->generateUploadQuery();
@@ -88,7 +84,6 @@
 
 		//Save the object
 		array_push($nodes, $node);
-		*/
 	}
 
 
@@ -96,7 +91,6 @@
 		STEP 2 : Read informations stored about every node, find dependencies, and
 		create relationsships in database.
 	*/
-		/*
 	foreach ($nodes as $node) {
 		echo $node->getPath()."<br>";
 		displayArray($node->getNamespaces());
@@ -116,7 +110,6 @@
 
 		echo "<br><br>";
 	}
-	*/
 
 
 
