@@ -153,7 +153,7 @@
 			$regex = "/include(_once)?\s+[-_ A-za-z0-9\$\.\"']+/";
 			if (preg_match($regex, $line)) { 
 				if ($this->isVariableInLine($line)) {
-					$line = $this->replaceVariables($line, $lineCount);
+					$line = $this->replaceVariable($line, $lineCount);
 				}
 				$line = $this->removeUnnecessary($line);
 				$line = $this->removeDoubleSlash($line);
@@ -170,7 +170,7 @@
 			$regex = "/require(_once)?\s+[-_ A-za-z0-9\$\.\"']+/";
 			if (preg_match($regex, $line)) { 
 				if ($this->isVariableInLine($line)) {
-					$line = $this->replaceVariables($line, $lineCount);
+					$line = $this->replaceVariable($line, $lineCount);
 				}
 				$line = $this->removeUnnecessary($line);
 				$line = $this->removeDoubleSlash($line);
@@ -237,102 +237,88 @@
 			@param lineCount (int) is the number of the line
 			@return (string) is the new line
 		*/
-		private function replaceVariables($line, $lineCount) {
-			$variableNames = $this->identifyVariable($line);
-			$variableDatas = $this->findVariableValue($variableNames, $lineCount);
-			$line = $this->replaceVariableWithValue($line, $variableDatas);
+		private function replaceVariable($line, $lineCount) {
+			$variableName = $this->identifyVariable($line);
+			//echo $variableName." : ";
+			$value = $this->findVariableValue($variableName, $lineCount);
+			//echo $value." ------- ";
+			$line = $this->replaceVariableWithValue($line, $variableName, $value);
+			//echo $line."<br>";
 			return $line;
 		}
 		
 		/**
-			This method allows to detect variable names in a line. The variable names
-			(with the $) will be returned in an array.
+			Identify the use of a variable in a code line. This function can be used only if
+			it is sure that a there is a variable in the line (see function 
+			isVariableInLine(string) to test presence of variable.
 			@param line (string) is the line
-			@return is the array containing the founded variable names
+			@return (string) is the name of the variable (with the $)
 		*/
 		private function identifyVariable($line) {
-			$output = array();
 			$endVariableChar = array('.', ';', ' ');
 			$tab = str_split($line);
-			$inVariable = false;
+			$inVariable = 0;
 			$variableName = "";
 			foreach ($tab as $index => $character) {
 				if ($character === "$") {
-					$inVariable = true;
+					$inVariable = 1;
 				}
 				if ($inVariable && in_array($character, $endVariableChar)) {
-					array_push($output, $variableName);
-					$inVariable = false;
-					$variableName = "";
+					break;
 				}
 				if ($inVariable) {
 					$variableName.= $character;
 				}
 			}
-			//displayArray($output);
-			return $output;
+			return $variableName;
 		}
 
 		/**
-			Find where given variables are declared in file, and return their values
-			@param variableNames (string) an array containing the name of the variables
-			@param maxLine (int) is the line where the variable are used in the include 
+			Find where a given variable is declared in file, and return her value
+			@param variableName (string) is the name of the variable
+			@param maxLine (int) is the line where the variable is used in the include 
 				statement (the declaration is necessarily before)
 			@return (string) is the value of the variable
 		*/
-		private function findVariableValue($variableNames, $maxLine) {
-			//First, go through file and find the line where the variable is declared
-			$declarationLines = array();
+		private function findVariableValue($variableName, $maxLine) {
+			//First, go through file and find variable in file
 			$lineCount = 0;
 			$fileHandler = fopen($this->_path, 'r');
+			$line;
 			while (!feof($fileHandler)) {
 				$line = fgets($fileHandler);
 				$lineCount ++;
-				foreach ($variableNames as $variableName) {
-					if (startsWith(trim($line), $variableName)) {
-						$declarationLines[$variableName] = $line;
-						//echo "found<br>";
-					}
-				}
-				if (sizeof($variableNames) == sizeof($declarationLines)) {
+				if (startsWith(trim($line), $variableName)) {
+					fclose($fileHandler);
 					break;
-				}
+				} 
 				if ($lineCount >= $maxLine) {
-					throw new Exception("Declaration of variable $variableName not found in ".$this->getPathFromRepo($this->_path, $this->_repoName).".<br>");
-				}
+					throw new Exception("Declaration of variable $variableName not found in ".$this->getPathFromRepo().".<br>");
+				}	
 			}
-
-			//displayArray($declarationLines);
-
 			//Then, analyse line et get value
-			$output = array();
-			foreach ($declarationLines as $variableName => $line) {
-				if (strpos($line, '"')) {
-					$output[$variableName] = explode('"', $line)[1];
-				}
-				else if (strpos($line, "'")) {
-					$output[$variableName] = explode('"', $line)[1];
-				}
-				else {
-					echo "Ununderstood variable declaration in ".$this->_path." , line ".$lineCount.".<br>";
-				}
+			$tab = str_split($line);
+			if (in_array('"', $tab)) {
+				return explode('"', $line)[1];
 			}
-			//displayArray($output);
-			return $output;
+			else if (in_array("'", $tab)) {
+				return explode("'", $line)[1];
+			}
+			else {
+				throw new Exception("Ununderstood variable declaration in ".$this->_path." , line ".$lineCount.".");
+			}
 		}
 
 		/**
 			Replace a variable with her value in an include or require line, and put 
 			double quotes around it.
 			@param line (string) is the include line
-			@param variableDatas is an array associating each variable name with her value
+			@param variableName (string) is the name of the variable (with the $)
+			@param value (string) is the value of the variable
 			@return (string) is the modified line
 		*/
-		private function replaceVariableWithValue($line, $variableDatas) {
-			foreach ($variableDatas as $variableName => $variableValue) {
-				$line = str_replace($variableName, '"'.trim($variableValue).'"', $line);
-			}
-			return $line;
+		private function replaceVariableWithValue($line, $variableName, $value) {
+			return str_replace($variableName, '"'.trim($value).'"', $line);
 		}
 
 
@@ -480,7 +466,7 @@
 				$query.= "CREATE (n)-[:DEFINES]->(ns".$counter.") ";	
 			}
 
-			//echo $query."<br>";
+			echo $query."<br>";
 			return $query;
 		}
 
