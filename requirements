@@ -3,3 +3,6 @@ php-bcmath
 
 neo4j-php-client (library)
 -> composer require graphaware/neo4j-php-client:^4.0
+
+php-mbstring
+-> apt install php7.2-mbstring

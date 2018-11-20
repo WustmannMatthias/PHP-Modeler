@@ -11,7 +11,10 @@
 	}
 
 
-	function array_trim_end($array){
+	/**
+		Remove the last item of an array and returns the array
+	*/
+	function array_trim_end($array) {
 		$num = count($array);
 		$num = $num-1;
 		unset($array[$num]);

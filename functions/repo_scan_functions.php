@@ -62,7 +62,8 @@
 
 
 	/**
-		Take the URL of a githyub repository and gives back the name of the repo
+		Take the URL of a github repository or a path of the directory and gives back 
+		the name of the repo
 		@param $path is a String
 		@return is a String
 	*/

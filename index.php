@@ -25,7 +25,7 @@
 		echo "Exception while scanning directory : ".$e->getMessage();
 		exit;
 	}
-	$files = keepSpecificTypesOnly($files, array(".php"));
+	$files = keepSpecificTypesOnly($files, array('.php', '.inc'));
 	$repoName = getRepoName(X_TEST_REPO_PATH);
 	
 	
@@ -37,8 +37,6 @@
 	runQuery($client, "MATCH (n)-[r]->(n2) DELETE r, n, n2");
 	runQuery($client, "MATCH (n) DELETE n");
 	
-
-
 
 	
 	$nodes = array(); //just a container
