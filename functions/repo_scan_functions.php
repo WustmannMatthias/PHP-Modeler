@@ -61,6 +61,15 @@
 	}
 
 
+	/**
+		Take the URL of a githyub repository and gives back the name of the repo
+		@param $path is a String
+		@return is a String
+	*/
+	function getRepoName($path) {
+		$endPath = @end(explode("/", $path));
+		return str_replace(".git", "", $endPath);
+	}
 
 
 ?>

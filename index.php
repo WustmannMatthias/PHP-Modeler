@@ -1,41 +1,38 @@
 <?php
+	error_reporting(E_ALL);
 
 	require_once "objects/Node.php";
 	require_once "functions/common_functions.php";
 	require_once "functions/repo_scan_functions.php";
 	require_once "functions/database_functions.php";
 	require_once "vendor/autoload.php";
+	require_once "constants.php";
 
 
 	use GraphAware\Neo4j\Client\ClientBuilder;
 
 
 
-	$repoPath = "/home/thoums/Documents/www/PHP/X_test_repo";
-	$repoName = "X_test_repo";
-
-
 	$timestamp_start = microtime(true); //Just to mesure running time
 	
-	
-	
+
 	
 	//Get array of every file in repo
 	try {
-		$files = scanDirectory($repoPath, array());
+		$files = scanDirectory(X_TEST_REPO_PATH, array());
 	}
 	catch (Exception $e) {
 		echo "Exception while scanning directory : ".$e->getMessage();
 		exit;
 	}
 	$files = keepSpecificTypesOnly($files, array(".php"));
+	$repoName = getRepoName(X_TEST_REPO_PATH);
 	
-	//displayArray($files);
 	
 	
 	//Connexion to database + clear
 	$client = ClientBuilder::create()
-	    ->addConnection('bolt', 'bolt://neo4j:password@localhost:7687')
+	    ->addConnection('bolt', 'bolt://neo4j:password@10.8.1.72:7687')
 	    ->build();
 	runQuery($client, "MATCH (n)-[r]->(n2) DELETE r, n, n2");
 	runQuery($client, "MATCH (n) DELETE n");
