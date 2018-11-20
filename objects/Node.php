@@ -155,6 +155,9 @@
 				if ($this->isVariableInLine($line)) {
 					$line = $this->replaceVariables($line, $lineCount);
 				}
+				if ($this->isMagicConstantInLine($line)) {
+					$line = $this->replaceMagicConstant($line);
+				}
 				$line = $this->removeUnnecessary($line);
 				$line = $this->removeDoubleSlash($line);
 				$path = $this->fillPath($line);
@@ -171,6 +174,9 @@
 			if (preg_match($regex, $line)) { 
 				if ($this->isVariableInLine($line)) {
 					$line = $this->replaceVariables($line, $lineCount);
+				}
+				if ($this->isMagicConstantInLine($line)) {
+					$line = $this->replaceMagicConstant($line);
 				}
 				$line = $this->removeUnnecessary($line);
 				$line = $this->removeDoubleSlash($line);
@@ -342,8 +348,10 @@
 			@return is also a String
 		*/
 		private function replaceMagicConstant($line) {
+			//echo $line;
 			$dirPath = str_replace($this->_name, "", $this->_path);
 			$newline = str_replace("__DIR__", '"'.$dirPath.'"', $line);
+			//echo "<br>".$newline."<br>";
 			return $newline;
 		}
 
@@ -354,6 +362,7 @@
 			@return (string) is the new line
 		*/
 		private function removeUnnecessary($line) {
+			//echo $line."<br>";
 			$tab = str_split(trim($line));
 			$inSimpleQuotes = false;
 			$inDoubleQuotes = false;
@@ -369,6 +378,7 @@
 					$output.= $character;
 				}
 			}
+			//echo $output."<br>";
 			return $output;
 		}
 
@@ -379,7 +389,9 @@
 			@return is a String
 		*/
 		private function removeDoubleSlash($line) {
-			return str_replace('//', '/', $line);
+			$line = str_replace('//', '/', $line);
+			//echo $line."<br>";
+			return $line;
 		}
 
 
@@ -404,26 +416,33 @@
 		}
 
 
+		
 		/**
-			Takes a relative path and returns an absolute path
-			@param dependenciesTab is an array of relative path
-			@param output is an array of absolute path
+			Takes a relative path, or a path containing some '.' or '..' in it,
+			and returns the full filled path.
+			@param $path is a String
+			@param $newPath is a String
 		*/
 		private function fillPath($path) {
-			$currentFilePath = str_replace($this->_name, "", $this->_path);
-			$dependencyPath = $path;
-
-			$dependencyStartPath = $currentFilePath;
-			$dependencyEndPath = $dependencyPath;
-			
-			while (startsWith($dependencyPath, "../")) {
-				$dependencyEndPath = substr($dependencyPath, 3);
-				$dependencyPath = $dependencyEndPath;
-
-				$dependencyStartPath = substr($currentFilePath, 0, -1);
-				$dependencyStartPath = implode('/', array_trim_end(explode('/', $dependencyStartPath))).'/';
+			//while (strpos('../', $path) === 0) {
+			//	
+			//}
+			$tab = explode('/', $path);
+			$newTab = array();
+			foreach ($tab as $item) {
+				if ($item == '.') {
+					continue;
+				}
+				elseif ($item == '..') {
+					$newTab = array_trim_end($newTab);
+				}
+				else {
+					array_push($newTab, $item);
+				}
 			}
-			return $dependencyStartPath.$dependencyEndPath;
+
+			$newPath = implode('/', $newTab);
+			return $newPath;
 		}
 
 

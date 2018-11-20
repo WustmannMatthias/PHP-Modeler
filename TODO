@@ -51,6 +51,7 @@ Améliorations de l'étape 1 à faire avant de continuer :
 - Distinguer les include des require dans la modélisation (OK)
 - Avancer un peu dans le rapport (OK)
 - Indiquer le path par rapport au repo et non par rapport à la racine du système hôte (OK)
+- Prendre en compte que les chemins d'accès peuvent contenir la constante magique __DIR__, qu'il faudra donc remplacer par le chemin d'accès correspondant (OK)
 
 
 

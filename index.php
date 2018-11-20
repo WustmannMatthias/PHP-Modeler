@@ -14,19 +14,23 @@
 
 
 	$timestamp_start = microtime(true); //Just to mesure running time
+
+	$repoToTest = PRICER_REALLY_SMALL_TEST_PATH;
+	//$repoToTest = X_TEST_REPO_PATH;
 	
+
 
 	
 	//Get array of every file in repo
 	try {
-		$files = scanDirectory(X_TEST_REPO_PATH, array());
+		$files = scanDirectory($repoToTest, array());
 	}
 	catch (Exception $e) {
 		echo "Exception while scanning directory : ".$e->getMessage();
 		exit;
 	}
 	$files = keepSpecificTypesOnly($files, array('.php', '.inc'));
-	$repoName = getRepoName(X_TEST_REPO_PATH);
+	$repoName = getRepoName($repoToTest);
 	
 	
 	
@@ -56,15 +60,20 @@
 		$node->analyseFile();
 		echo "<br>";
 		
-		/*
+		
 		//Debuging 
-		echo "<br>".$file."<br>";
+		echo "Features : <br>";
 		displayArray($node->getFeatures());
+		echo "Includes : <br>";
 		displayArray($node->getIncludes());
+		echo "Requires : <br>";
 		displayArray($node->getRequires());
+		echo "Namespaces : <br>";
 		displayArray($node->getNamespaces());
+		echo "Uses : <br>";
 		displayArray($node->getUses());
-		*/
+
+		
 
 
 		//Send node in database
