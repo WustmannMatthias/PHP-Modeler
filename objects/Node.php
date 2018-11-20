@@ -6,8 +6,8 @@
 	*/
 
 	require_once "functions/common_functions.php";
-
-	define("FEATURE_DEFINITION", "§§");
+	require_once "constants.php";
+	
 
 
 

@@ -32,7 +32,7 @@
 	
 	//Connexion to database + clear
 	$client = ClientBuilder::create()
-	    ->addConnection('bolt', 'bolt://neo4j:password@10.8.1.72:7687')
+	    ->addConnection('bolt', 'bolt://neo4j:password@localhost:7687')
 	    ->build();
 	runQuery($client, "MATCH (n)-[r]->(n2) DELETE r, n, n2");
 	runQuery($client, "MATCH (n) DELETE n");
@@ -55,14 +55,8 @@
 		
 		echo $node->getPath();
 		echo "<br>";
-		echo "###Analysis###<br>";
 		$node->analyseFile();
-		echo "###End###<br>";
-		
 		echo "<br>";
-		displayArray($node->getIncludes());
-		displayArray($node->getRequires());
-		echo "<br><br>";
 		
 		/*
 		//Debuging 
@@ -89,10 +83,6 @@
 		create relationsships in database.
 	*/
 	foreach ($nodes as $node) {
-		echo $node->getPath()."<br>";
-		displayArray($node->getNamespaces());
-		displayArray($node->getUses());
-
 		$includeQuery = $node->generateIncludeRelationQuery();
 		if ($includeQuery) {
 			//echo $includeQuery."<br>";
@@ -104,11 +94,7 @@
 			//echo $requireQuery."<br>";
 			runQuery($client, $requireQuery);
 		}
-
-		echo "<br><br>";
 	}
-
-
 
 
 	echo "<br>Done.";
