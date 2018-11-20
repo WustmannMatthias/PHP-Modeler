@@ -31,6 +31,7 @@
 	}
 	$files = keepSpecificTypesOnly($files, array('.php', '.inc'));
 	$repoName = getRepoName($repoToTest);
+	$repoName = "Pricer2016Q2";
 	
 	
 	
@@ -62,24 +63,25 @@
 		
 		
 		//Debuging 
-		echo "Features : <br>";
-		displayArray($node->getFeatures());
+		//echo "Features : <br>";
+		//displayArray($node->getFeatures());
 		echo "Includes : <br>";
 		displayArray($node->getIncludes());
 		echo "Requires : <br>";
 		displayArray($node->getRequires());
+		/*
 		echo "Namespaces : <br>";
 		displayArray($node->getNamespaces());
 		echo "Uses : <br>";
 		displayArray($node->getUses());
-
+		*/
 		
 
 
 		//Send node in database
 		$query = $node->generateUploadQuery();
 		runQuery($client, $query);
-
+		//echo "<br>".$query."<br>";
 		//Save the object
 		array_push($nodes, $node);
 	}
@@ -92,7 +94,7 @@
 	foreach ($nodes as $node) {
 		$includeQuery = $node->generateIncludeRelationQuery();
 		if ($includeQuery) {
-			//echo $includeQuery."<br>";
+			echo $includeQuery."<br>";
 			runQuery($client, $includeQuery);
 		}
 
