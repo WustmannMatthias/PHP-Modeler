@@ -150,7 +150,7 @@
 			@param lineCount is the number of the line (int)
 		*/
 		private function analyseIncludes($line, $lineCount) {
-			$regex = "/include(_once)?\s+[-_ A-za-z0-9\$\.\"']+/";
+			$regex = "/include(_once)?\s+[-_ A-Za-z0-9\$\.\"']+/";
 			if (preg_match($regex, $line)) { 
 				if ($this->isVariableInLine($line)) {
 					$line = $this->replaceVariables($line, $lineCount);
@@ -170,7 +170,7 @@
 			Like analyseIncludes($line, $lineCount), but for require statements
 		*/
 		private function analyseRequires($line, $lineCount) {
-			$regex = "/require(_once)?\s+[-_ A-za-z0-9\$\.\"']+/";
+			$regex = "/require(_once)?\s+[-_ A-Za-z0-9\$\.\"']+/";
 			if (preg_match($regex, $line)) { 
 				if ($this->isVariableInLine($line)) {
 					$line = $this->replaceVariables($line, $lineCount);
@@ -191,7 +191,7 @@
 			@param line is the line to analyse (String)
 		*/
 		private function analyseNameSpaces($line) {
-			$regex = "/^namespace\s+[-_ A-za-z0-9\\\]+/";
+			$regex = "/^namespace\s+[-_ A-Za-z0-9\\\]+/";
 			if (preg_match($regex, $line)) {
 				$namespace = $this->extractNamespace($line);
 				array_push($this->_namespaces, $namespace);
@@ -203,7 +203,7 @@
 			@param line is the line to analyse (String)
 		*/
 		private function analyseUses($line) {
-			$regex = "/^use\s+[-_ A-za-z0-9\\\]+/";
+			$regex = "/^use\s+[-_ A-Za-z0-9\\\]+/";
 			if (preg_match($regex, $line)) {
 				$use = $this->extractUses($line);
 				array_push($this->_uses, $use);
@@ -351,6 +351,7 @@
 			//echo $line;
 			$dirPath = str_replace($this->_name, "", $this->_path);
 			$newline = str_replace("__DIR__", '"'.$dirPath.'"', $line);
+			$newline = str_replace("dirname(__FILE__)", '"'.$dirPath.'"', $newline);
 			//echo "<br>".$newline."<br>";
 			return $newline;
 		}
@@ -447,13 +448,15 @@
 
 
 		/**
-			Replace each \ with \\ in the namespaces. Returns the new array
-			@return is an array
+			Replace each \ with \\ in a String (to do before sending a String with
+			a \ in a database, like namespaces).
+			@param $tab is an array of String
+			@return is an array of String
 		*/
-		private function prepareNamespaces() {
+		private function doubleBackSlashes($tab) {
 			$output = array();
-			foreach ($this->_namespaces as $namespace) {
-				array_push($output, str_replace("\\", "\\\\", $namespace));
+			foreach ($tab as $item) {
+				array_push($output, str_replace("\\", "\\\\", $item));
 			}
 			return $output;
 		}
@@ -475,6 +478,9 @@
 		*/
 		public function generateUploadQuery() {
 			//Create Node
+			$featureRelation = "IMPACTS";
+			$namespaceRelation = "DECLARES";
+
 			$query = "CREATE (n:File {name: '".$this->_name
 								."', path: '".$this->getPathFromRepo($this->_path, 
 									$this->_repoName)
@@ -488,15 +494,15 @@
 			foreach ($this->_features as $feature) {
 				$counter ++;
 				$query.= "MERGE (f".$counter.":Feature {name: '$feature'}) ";
-				$query.= "CREATE (n)-[:IMPACT]->(f".$counter.") ";
+				$query.= "CREATE (n)-[:".$featureRelation."]->(f".$counter.") ";
 			}
 
 			//Foreach of his namespaces, create Node and relationship if not already exists
 			$counter = 0;
-			foreach ($this->prepareNamespaces() as $namespace) {
+			foreach ($this->doubleBackSlashes($this->_namespaces) as $namespace) {
 				$counter ++;
 				$query.= "MERGE (ns".$counter.":Namespace {name: '$namespace'}) ";
-				$query.= "CREATE (n)-[:DEFINES]->(ns".$counter.") ";	
+				$query.= "CREATE (n)-[:".$namespaceRelation."]->(ns".$counter.") ";	
 			}
 
 			//echo $query."<br>";
@@ -504,16 +510,6 @@
 		}
 
 
-
-		/**
-			Generates à Cypher Query that identifies this instance in the neo4j Database
-			@return is a String
-		*/
-		public function generateMatchQuery() {
-			return "MATCH (n:File {path: '".$this->getPathFromRepo($this->_path, 
-					$this->_repoName)."'}) RETURN n";
-		}
-		
 
 
 		/**
@@ -527,7 +523,6 @@
 			if (sizeof($this->_includes) == 0) {
 				return false;
 			}
-MER
 			$includeRelation = "IS_INCLUDED_BY";
 
 			$path 		= $this->getPathFromRepo($this->_path, $this->_repoName);
@@ -582,6 +577,31 @@ MER
 
 
 
+		public function generateUseRelationQuery() {
+			
+		}
+
+
+		/**
+			Prepare an array with all use arguments ready to be sent in database
+			@return is an array : namespace => className
+		*/
+		public function prepareUses() {
+			$uses = array();
+
+			foreach ($this->_uses as $use) {
+				$tab = explode('\\', $use);
+				$class = $tab[sizeof($tab) - 1];
+				$tab = array_trim_end($tab);
+				$namespace = implode('\\\\', $tab);
+				$uses[$namespace] = $class;
+			}
+
+			return $uses;
+		}
+
+
+
 
 
 		/*******************************************************************************
@@ -599,7 +619,7 @@ MER
 			Delete the part of the part before the repo name
 			@return is a String
 		*/
-		private function getPathFromRepo($fullPath, $repoName) {
+		public function getPathFromRepo($fullPath, $repoName) {
 			return $repoName.'/'.explode('/'.$repoName.'/', $fullPath)[1];
 		}
 
