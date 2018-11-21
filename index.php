@@ -1,29 +1,28 @@
 <?php
 	error_reporting(E_ALL);
+	$timestamp_full = microtime(true);
+
 
 	require_once "objects/Node.php";
 	require_once "functions/common_functions.php";
 	require_once "functions/repo_scan_functions.php";
 	require_once "functions/database_functions.php";
 	require_once "vendor/autoload.php";
-	require_once "constants.php";
 
 
 	use GraphAware\Neo4j\Client\ClientBuilder;
 
 
-
-	$timestamp_start = microtime(true); //Just to mesure running time
-
+	//$repoToTest = "/home/wustmann/Documents/invoicing";
 	$repoToTest = PRICER_PATH;
-	//$repoToTest = X_TEST_REPO_PATH;
 	
 
 
 	
 	//Get array of every file in repo
+	$timestamp_directory = microtime(true);
 	try {
-		$files = getDirContents($repoToTest);
+		$files = getDirContent($repoToTest);
 	}
 	catch (Exception $e) {
 		echo "Exception while scanning directory : ".$e->getMessage();
@@ -31,6 +30,7 @@
 	}
 	$files = keepSpecificTypesOnly($files, array('.php', '.inc'));
 	$repoName = getRepoName($repoToTest);
+	$timestamp_directory = microtime(true) - $timestamp_directory;
 	
 	
 	
@@ -47,58 +47,34 @@
 
 	/**
 		STEP 1 : Analyse every file, store analysis, and send node in database
-		After this first step, every file have a representation in database, but have
-		no link between eachother.
-		However, links between files and features are modelised
+		After this first step, every file, namespace, and feature will be represented
+		in the modeling. However, links between files won't be.
 	*/
-	echo "<h1>STEP 1 ANALYSE</h1><br>";
+	echo "<h2>STEP 1 ANALYSE</h2>";
+	$timestamp_analyse = microtime(true);
 	foreach ($files as $file) {
 		//Create Node object for each file and analyse it
 		$node = new Node($file, $repoName);
-		
-		//echo $node->getPath();
-		//echo "<br>";
 		$node->analyseFile();
-		//echo "<br>";
-		
-		
-		//Debuging 
-		/*
-		echo "Features : <br>";
-		displayArray($node->getFeatures());
-		echo "Includes : <br>";
-		displayArray($node->getIncludes());
-		echo "Requires : <br>";
-		displayArray($node->getRequires());
-		*/
-		//echo "Namespaces : <br>";
-		//displayArray($node->getNamespaces());
-		//echo "Uses : <br>";
-		//displayArray($node->getUses());
-		
-		
-
 
 		//Send node in database
 		$query = $node->generateUploadQuery();
-		//echo "<br>".$query."<br>";
 		runQuery($client, $query);
 		
 		//Save the object
 		array_push($nodes, $node);
 	}
+	$timestamp_analyse = microtime(true) - $timestamp_analyse;
 
 
 	/**
-		STEP 2 : Read informations stored about every node, find dependencies, and
+		STEP 2 : Read informations stored in every node, find dependencies, and
 		create relationsships in database.
 	*/
-	echo "<h2>".'STEP 1 RUNNING TIME : ' .(microtime(true) - $timestamp_start). 's.';
-	echo "<br><br><br><br>";
-	echo "<h1>STEP 2 UPLOAD DEPENDENCIES</h1><br>";
+	
+	echo "<h2>STEP 2 UPLOAD DEPENDENCIES</h2>";
+	$timestamp_dependencies = microtime(true);
 	foreach ($nodes as $node) {
-		echo $node->getPath()."<br>";
-
 		//Send include relations in database
 		$includeQuery = $node->generateIncludeRelationQuery();
 		if ($includeQuery) {
@@ -113,57 +89,28 @@
 			runQuery($client, $requireQuery);
 		}
 
-		/*
-		SEND USE RELATIONS IN DATABASE
-		*/
-		if (sizeof($node->getUses()) == 0) {
-			continue;
-		}
-		$uses = $node->prepareUses(); // array(namespace => className)
-		displayArray($uses);
-
-		$useRelation = "IS_USED_BY";
-
-		$path 		= $node->getPathFromRepo($node->getPath(), $node->getRepoName());
-		$queryBegin = "MATCH (f:File {path: '".$path."'}) " ;
-		$queryEnd	= "";
-
-		$counter = 0;
-		foreach ($uses as $namespace => $className) { //For each USE found in the file
-			$counter ++;
-			$tempQuery = "MATCH (n:Namespace {name: '$namespace'}) 
-							RETURN n.name as namespace";
-			$tempResult = runQuery($client, $tempQuery);
-
-			if (sizeof($tempResult->records()) === 1) { // Namespace already exists
-				$queryBegin	.= "MATCH (n".$counter.":Namespace {name: '$namespace'}) ";
-				$queryEnd	.= "CREATE (n".$counter.")-[:$useRelation]->(f) ";
-			}
-			elseif (sizeof($tempResult->records()) === 0) { // Namespace doesnt exist
-				$queryEnd	.= "CREATE (n".$counter.":Namespace {name: '$namespace', 
-								non_declared: 'True'})-[:$useRelation]->(f) ";
-			}
-			else { //(sizeof($tempResult->records()) > 1) : Should'nt happend
-				echo "WTF can't be true :o<br>";
-				continue;
-			}
-		}
-
-		$useQuery = $queryBegin.$queryEnd;
-		if ($useQuery != $queryBegin) {
-			echo $useQuery."<br>";
+		//Send use relations in database
+		$useQuery = $node->generateUseRelationQuery();
+		if ($useQuery) {
+			//echo $useQuery."<br>";
 			runQuery($client, $useQuery);
 		}
-
-		echo "<br><br>";
 	}
+	$timestamp_dependencies = microtime(true) - $timestamp_dependencies;
 
 
 	echo "<br>Done.";
-
-
 	echo "<br><br>";
-	echo "<h2>".'FULL RUNNING TIME : ' .(microtime(true) - $timestamp_start). 's.<br>';
+
+	$timestamp_full = microtime(true) - $timestamp_full;
+
+
+	echo "<h2>PERFORMANCES</h2>";
+	echo "Time to load repository : $timestamp_directory<br>";
+	echo "Time analyse repository : $timestamp_analyse<br>";
+	echo "Time upload dependencies : $timestamp_dependencies<br>";
+	echo "Script full running time : $timestamp_full<br>";
+
 
 
 ?>

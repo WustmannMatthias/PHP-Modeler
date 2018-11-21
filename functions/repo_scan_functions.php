@@ -6,7 +6,7 @@
 		@param tab is the array in witch you want to put all filenames of the files of the directory
 		@return is an array
 	*/
-	function scanDirectory($dir, $tab) {
+	function scanDirectory($dir, $tab=array()) {
 		if (!is_dir($dir)) { //is it a directory ?
 			throw new Exception("$dir is not a directory");
 		}
@@ -41,7 +41,7 @@
 		return array_unique($tab);
 	}
 
-	function getDirContents($dir, &$results = array()){
+	function getDirContent($dir, &$results = array()){
 		$files = scandir($dir);
 
 		foreach($files as $key => $value){
@@ -49,7 +49,7 @@
 			if(!is_dir($path)) {
 				$results[] = $path;
 			} else if($value != "." && $value != "..") {
-				getDirContents($path, $results);
+				getDirContent($path, $results);
 				//$results[] = $path;
 			}
 		}

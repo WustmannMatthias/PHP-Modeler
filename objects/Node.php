@@ -534,8 +534,8 @@
 				$includePath = $this->getPathFromRepo($include, $this->_repoName);
 				$iCounter ++;
 				$queryBegin .= "MATCH (ni".$iCounter.":File {path: '$includePath'}) ";
-				$queryEnd 	.= "CREATE (ni".$iCounter.")-[ri".$iCounter.":".$includeRelation
-						."]->(ni) ";
+				$queryEnd 	.= "CREATE (ni".$iCounter.")-[ri".$iCounter.":"
+							.$includeRelation."]->(ni) ";
 			}
 
 			$query = $queryBegin.$queryEnd;
@@ -566,8 +566,8 @@
 				$requirePath = $this->getPathFromRepo($require, $this->_repoName);
 				$rCounter ++;
 				$queryBegin .= "MATCH (nr".$rCounter.":File {path: '$requirePath'}) ";
-				$queryEnd .= "CREATE (nr".$rCounter.")-[rr".$rCounter.":".$requireRelation
-						."]->(nr) ";
+				$queryEnd 	.= "CREATE (nr".$rCounter.")-[rr".$rCounter.":"
+							.$requireRelation."]->(nr) ";
 			}
 
 			$query = $queryBegin.$queryEnd;
@@ -577,9 +577,32 @@
 
 
 
+
 		public function generateUseRelationQuery() {
-			
+			if (sizeof($this->_uses) == 0) {
+				return false;
+			}
+
+			$uses = $this->prepareUses();
+
+			$useRelation = "IS_USED_BY";
+
+			$path 		= $this->getPathFromRepo($this->getPath(), $this->getRepoName());
+			$queryBegin = "MATCH (f:File {path: '".$path."'}) " ;
+			$queryEnd	= "";
+
+			$counter = 0;
+			foreach ($uses as $namespace => $className) {
+				$counter ++;
+				$queryBegin	.= "MERGE (n".$counter.":Namespace {name: '$namespace'}) ";
+				$queryEnd	.= "CREATE (n".$counter.")-[:$useRelation {class: 
+								'$className'}]->(f) ";
+			}
+
+			$query = $queryBegin.$queryEnd;
+			return $query;
 		}
+
 
 
 		/**
