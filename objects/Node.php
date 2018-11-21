@@ -577,7 +577,13 @@
 
 
 
-
+		/**
+			Generates a Cypher Query that creates every relation between this nodes and 
+			the other namespaces it uses elements from.
+			@return is a mixed value : 
+				- if there aren't any use statement in this file, returns false
+				- if there are, return is a String : the Cypher query
+		*/
 		public function generateUseRelationQuery() {
 			if (sizeof($this->_uses) == 0) {
 				return false;

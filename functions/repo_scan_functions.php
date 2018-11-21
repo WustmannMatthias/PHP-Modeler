@@ -2,7 +2,7 @@
 
 	/**
 		Scans (recursively) a directory and returns all complete filenames within it in an array
-		@param dir is the path to a directory
+		@param dir is the path to a directory to scan
 		@param tab is the array in witch you want to put all filenames of the files of the directory
 		@return is an array
 	*/
@@ -41,16 +41,22 @@
 		return array_unique($tab);
 	}
 
+
+
+	/**
+		new recursive function to scan the directory, much more efficient.
+		@param dir is the path to a directory to scan (String)
+		@param results is the array ot store the results in
+	*/
 	function getDirContent($dir, &$results = array()){
 		$files = scandir($dir);
 
-		foreach($files as $key => $value){
-			$path = realpath($dir.DIRECTORY_SEPARATOR.$value);
+		foreach($files as $file){
+			$path = realpath($dir.DIRECTORY_SEPARATOR.$file);
 			if(!is_dir($path)) {
-				$results[] = $path;
-			} else if($value != "." && $value != "..") {
+				array_push($results, $path);
+			} else if($file != "." && $file != "..") {
 				getDirContent($path, $results);
-				//$results[] = $path;
 			}
 		}
 

@@ -62,7 +62,7 @@ Améliorations de l'étape 1 à faire avant de continuer :
 
 
 
-ETAPE 2 : Ajouter les features au graph
+ETAPE 2 : Ajouter les features au graph (OK !)
 
 Il va ici s'agir de trouver les fichiers en tête de l'arborescence des dépendences. Ces fichiers devront être reliés à une ou plusieurs features. 
 
@@ -96,7 +96,7 @@ But : Pour n'importe quel fichier modifié, on doit pouvoir parcourir les relati
 
 
 
-ETAPE 3 : Revisiter l'architecture du programme.
+ETAPE 3 : Revisiter l'architecture du programme. (OK !)
 
 Comme expliqué dans le fichier subject.odt, il fallait revisiter la classe Node afin qu'elle stocke tous les éléments essentiels du programme dans ses attributs.
 	
@@ -107,24 +107,60 @@ Lidée est, lors de la création d'un objet Node par fichier, de ne pas seulemen
 
 
 
-ETAPE 4 : Prendre en compte les inclusions par namespaces.
+
+
+
+
+ETAPE 4 : Prendre en compte les inclusions par namespaces. (OK !)
 
 Il a d'abord fallu apprendre les notions de namespace en php. Une classe, une variable ou une fonction peuvent être identifées de manière unique par leur nom précédé de leur namespace. Cela permettra par exemple de dissocier la fonction sizeof() du namespace global (fonction définie par php) de la fonction My\Namespace\sizeof() définie par les développeurs dans le namespace My\Namespace
 
-	- D'abord, modifier la classe Node afin que, lors du premier parcours du fichier (analyse), les namespaces et les alias (use) déclarés soient stockés dans les attributs de l'objet. 
-	- Dans la méthode generateUploadQuery, ajouter quelques lignes afin d'envoyer également les namespaces déclarés et de créer les relations entre fichiers et namespaces (à la manière de l'étape 2)
-	- Pour les alias use, il faut séparer le nom du namespace du nom de la classe aliassée.
+	- D'abord, modifier la classe Node afin que, lors du premier parcours du fichier (analyse), les namespaces et les alias (use) déclarés soient stockés dans les attributs de l'objet. (OK)
+	- Dans la méthode generateUploadQuery, ajouter quelques lignes afin d'envoyer également les namespaces déclarés et de créer les relations entre fichiers et namespaces (comme pour l'étape 2) (OK)
+	- Pour les alias use, il faut séparer le nom du namespace du nom de la classe aliassée. (OK)
 	
 	- Ensuite, dans le programme principal, dans la seconde boucle qui se charge d'uploader les relations dans la bdd, il faut ajouter toutes les relations USE
 		- D'abord, pour chaque use, vérifier si le namespace aliassé existe dans la bdd (!!!REQUETE A ENVOYER)
 			- Si oui, on tisse la relation
 			- Si non, On crée un namespace avec un attribut supplémentaire "non-declared" valant True, puis on tisse la relation.
 	- Problème : Tout ce code dans le programme principal est très mauvais, mais on ne peut pas demander à la classe Node d'effectuer des requetes a la base de donnée : elle doit suelement les générer.
-	- SOLUTION : Créer une classe Use
+	- SOLUTION : Créer une classe Use (TRES MAUVAISE IDEE)
 		- L'attribut de Node _uses sera un array de Use
 		- Les objets Use possèderont des méthodes de génération de requêtes : une pour vérifier si le namespace existe dans la base, et une pour créer les relation
 		- Le constructeur de l'objet Use prendra en paramètre le chemin d'accès complet du namespace + classe et se chargera tous seul de spliter les éléments.
-		
+	- MEILLEURE SOLUTION (OK)
+		- Au lieu d'indiquer explicitement dans le graph les Namespaces qui ne sont pas déclarés, on peut juste faire comme si ne rien n'était.
+			-> On ajoute les relations IS_USED_BY entre les namespaces et les fichiers sans vérifier si le namespace existe déjà dans la base (on matche le NS avec la clause MERGE)
+		- Par la suite, on pourra déceler les namespaces orphelins très simplement, car aucun fichier n'aura de relation DECLARES pointant sur lui.
+		- Ainsi, il suffit de reprendre les méthodes generateIncludeRelationQuery et generateRequireRelationQuery et de les adapter aux relations des use.
+		- Au cas ou ça serve à un moment, on stocke les classes aliassées par le use dans les propriétés de la relation
+
+
+
+
+
+
+
+ETAPE 5 : Ajouter des index et des constraints au graph (petite étape)
+
+Il faudra d'abord lire attentivement la documentation afin de comprendre ce que sont les index, et pourquoi peuvent ils être intéressants et utiles.
+
+
+
+
+
+
+
+ETAPE 6 : Commencer à préparer des requêtes qui sortiront des éléments intéressants du graph : 
+	-> Les fichiers orphelins
+	-> Les éléments en tête d'architecture
+	-> Les fichiers impactées par un fichier donné
+
+
+
+
+
+
 
 
 
