@@ -98,33 +98,32 @@
 			- declared features
 		*/
 		public function analyseFile() {
+			if (!file_exists($this->_path)) {
+				throw new Exception("File ".$this->_path." doesn't exist. ");
+			}
+
 			$inComment = false;
 			$lineCount = 0;
+		
+			$fileHandler = fopen($this->_path, 'r');
+			while (!feof($fileHandler)) {
+				$line = trim(fgets($fileHandler));
+				$lineCount ++;
 
-			try {
-				$fileHandler = fopen($this->_path, 'r');
-				while (!feof($fileHandler)) {
-					$line = trim(fgets($fileHandler));
-					$lineCount ++;
-
-					$this->analyseFeatures($line);
-					
-					// Comments handling
-					if (startsWith($line, "//")) continue;
-					if (startsWith($line, "/*")) $inComment = true;
-					if ($inComment) {
-						if (strpos($line, "*/") === false) continue;
-						else $inComment = false;
-					}
-
-					$this->analyseIncludes($line, $lineCount);
-					$this->analyseRequires($line, $lineCount);
-					$this->analyseNameSpaces($line);
-					$this->analyseUses($line);
+				$this->analyseFeatures($line);
+				
+				// Comments handling
+				if (startsWith($line, "//")) continue;
+				if (startsWith($line, "/*")) $inComment = true;
+				if ($inComment) {
+					if (strpos($line, "*/") === false) continue;
+					else $inComment = false;
 				}
-			}
-			catch (Exception $e) {
-				echo $e->getMessage()."<br>";
+
+				$this->analyseIncludes($line, $lineCount);
+				$this->analyseRequires($line, $lineCount);
+				$this->analyseNameSpaces($line);
+				$this->analyseUses($line);
 			}
 		}
 
@@ -778,7 +777,7 @@
 			toString descriptive method
 			@return is a String
 		*/
-		public function toString() {
+		public function __toString() {
 			return "name 			=> ".$this->_name
 			  ."<br>path 			=> ".$this->_path
 			  ."<br>size 			=> ".$this->_size
