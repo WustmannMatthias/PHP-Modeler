@@ -160,7 +160,7 @@
 				}
 				$line = $this->removeUnnecessary($line);
 				$line = $this->removeDoubleSlash($line);
-				$path = $this->fillPath($line);
+				$path = $this->fillPath($line, $lineCount);
 
 				array_push($this->_includes, $path);
 			}
@@ -180,7 +180,7 @@
 				}
 				$line = $this->removeUnnecessary($line);
 				$line = $this->removeDoubleSlash($line);
-				$path = $this->fillPath($line);
+				$path = $this->fillPath($line, $lineCount);
 
 				array_push($this->_requires, $path);
 			}
@@ -420,17 +420,58 @@
 		
 		/**
 			Takes a relative path, or a path containing some '.' or '..' in it,
-			and returns the full filled path.
+			and returns the absolute filled path.
+			
+			Strategy (maybe not the best, but easy and working) : 
+			1) First, concatenate directory of the current node with the relative path of 
+			his dependency.
+				if the result path matches an actual file, then all right.
+				if it's not, then let's try with the parent directory of the current node.
+				And so on...
+			=> Works for relative path !!
+			If path is already absolute, no need to do this
+			Note : the php function file_exists() works with path containing /../
+
+			2) Then, remove the . and .. fields of the path with their values
+
 			@param $path is a String
+			@param $lineCount is the line where the include/require statement was found
+				(for error messages)
 			@param $newPath is a String
 		*/
-		private function fillPath($path) {
-			echo $path."<br>";
-			$path = dirname($this->_path).'/'.$path;
-			echo $path."<br>";
+		private function fillPath($path, $lineCount) {
+			if (!$this->isAbsolutePath($path)) { // No need to concatenate for absolute paths
+				//echo $path."<br>";
+				$dirname = dirname($this->_path);
+				//echo $dirname."<br>";
+				$counter = 0;
+				while (!file_exists($dirname.'/'.$path)) {
+					//echo $dirname.'/'.$path."<br>";
+					$dirname = $this->removeLastDirectoryInPath($dirname);
+					$counter ++;
+					if ($counter > 20) { //Security, to avoid infinite loop
+						echo "Method fillPath not working for dependency $path of file "
+								.$this->_path." on line $lineCount. <br>";
+						break;
+					}
+				}
+				$path = $dirname.'/'.$path;
+				echo $path."<br>";
+			}
+
+
+				
+			if (!file_exists($path)) {
+				echo "File ".$this->_path." requires dependency $path on line $lineCount
+						but this file doesn't exists.<br>";
+				return "";
+			}
+			
+
+			//Replace . and .. with the corresponding directories
+			//NOTE : php function realpath does the same, but needs execution rights
+			//in all directories of the path
 			$tab = explode('/', $path);
-
-
 			$newTab = array();
 			foreach ($tab as $item) {
 				if ($item == '.') {
@@ -445,8 +486,38 @@
 			}
 
 			$newPath = implode('/', $newTab);
-			echo $newPath."<br><br>";
+			//echo "NewPath : ".$newPath;
+			//echo "<br><br>";
 			return $newPath;
+		}
+
+
+		/**
+			Help function for fillPath
+			Determines whether a given path is absolute or not
+			@param path is a String
+			@return is a bool
+		*/
+		private function isAbsolutePath($path) {
+			if (startsWith($path, '/')) {
+				return true;
+			}
+			return false;
+		}
+
+
+		/**
+			Help function for fillPath
+			Takes a relative path and remove the last item
+			Ex : examples/frames/directory -> exemples/frames
+			@param path is a String
+			@return is a String
+		*/
+		private function removeLastDirectoryInPath($path) {
+			$tab = explode('/', $path);
+			$tab = array_trim_end($tab);
+			$path = implode('/', $tab);
+			return $path;
 		}
 
 
@@ -464,6 +535,9 @@
 			}
 			return $output;
 		}
+
+
+
 
 
 
@@ -652,6 +726,8 @@
 			@return is a String
 		*/
 		public function getPathFromRepo($fullPath, $repoName) {
+			//echo "Full path : $fullPath<br>";
+			//echo "Repo Name : $repoName<br>";
 			return $repoName.'/'.explode('/'.$repoName.'/', $fullPath)[1];
 		}
 
