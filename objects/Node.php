@@ -244,9 +244,9 @@
 			@return (string) is the new line
 		*/
 		private function replaceVariables($line, $lineCount) {
-			$variableNames = $this->identifyVariable($line);
-			$variableDatas = $this->findVariableValue($variableNames, $lineCount);
-			$line = $this->replaceVariableWithValue($line, $variableDatas);
+			$variableNames 	= $this->identifyVariable($line);
+			$variableDatas 	= $this->findVariableValue($variableNames, $lineCount);
+			$line 			= $this->replaceVariableWithValue($line, $variableDatas);
 			return $line;
 		}
 		
@@ -425,10 +425,12 @@
 			@param $newPath is a String
 		*/
 		private function fillPath($path) {
-			//while (strpos('../', $path) === 0) {
-			//	
-			//}
+			echo $path."<br>";
+			$path = dirname($this->_path).'/'.$path;
+			echo $path."<br>";
 			$tab = explode('/', $path);
+
+
 			$newTab = array();
 			foreach ($tab as $item) {
 				if ($item == '.') {
@@ -443,8 +445,10 @@
 			}
 
 			$newPath = implode('/', $newTab);
+			echo $newPath."<br><br>";
 			return $newPath;
 		}
+
 
 
 		/**
@@ -524,7 +528,6 @@
 				return false;
 			}
 			$includeRelation = "IS_INCLUDED_BY";
-
 			$path 		= $this->getPathFromRepo($this->_path, $this->_repoName);
 			$queryBegin = "MATCH (ni:File {path: '".$path."'}) " ;
 			$queryEnd	= "";
@@ -593,7 +596,7 @@
 
 			$useRelation = "IS_USED_BY";
 
-			$path 		= $this->getPathFromRepo($this->getPath(), $this->getRepoName());
+			$path 		= $this->getPathFromRepo($this->_path, $this->_repoName);
 			$queryBegin = "MATCH (f:File {path: '".$path."'}) " ;
 			$queryEnd	= "";
 

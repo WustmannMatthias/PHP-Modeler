@@ -14,7 +14,7 @@
 
 
 	//$repoToTest = "/home/wustmann/Documents/invoicing";
-	$repoToTest = PRICER_PATH;
+	$repoToTest = TEST_REPO;
 	
 
 
@@ -42,8 +42,11 @@
 	runQuery($client, "MATCH (n) DELETE n");
 	
 
-	
-	$nodes = array(); //just a container
+
+
+
+
+
 
 	/**
 		STEP 1 : Analyse every file, store analysis, and send node in database
@@ -52,9 +55,12 @@
 	*/
 	echo "<h2>STEP 1 ANALYSE</h2>";
 	$timestamp_analyse = microtime(true);
+	$nodes = array();
 	foreach ($files as $file) {
 		//Create Node object for each file and analyse it
 		$node = new Node($file, $repoName);
+		echo "FILE : ".$node->getPath();
+		echo "<br>";
 		$node->analyseFile();
 
 		//Send node in database
@@ -63,6 +69,7 @@
 		
 		//Save the object
 		array_push($nodes, $node);
+		echo "<br><br><br>";
 	}
 	$timestamp_analyse = microtime(true) - $timestamp_analyse;
 
@@ -78,21 +85,18 @@
 		//Send include relations in database
 		$includeQuery = $node->generateIncludeRelationQuery();
 		if ($includeQuery) {
-			//echo $includeQuery."<br>";
 			runQuery($client, $includeQuery);
 		}
 
 		//Send require relations in database
 		$requireQuery = $node->generateRequireRelationQuery();
 		if ($requireQuery) {
-			//echo $requireQuery."<br>";
 			runQuery($client, $requireQuery);
 		}
 
 		//Send use relations in database
 		$useQuery = $node->generateUseRelationQuery();
 		if ($useQuery) {
-			//echo $useQuery."<br>";
 			runQuery($client, $useQuery);
 		}
 	}
@@ -106,10 +110,10 @@
 
 
 	echo "<h2>PERFORMANCES</h2>";
-	echo "Time to load repository : $timestamp_directory<br>";
-	echo "Time analyse repository : $timestamp_analyse<br>";
-	echo "Time upload dependencies : $timestamp_dependencies<br>";
-	echo "Script full running time : $timestamp_full<br>";
+	echo "Time to load repository : $timestamp_directory s<br>";
+	echo "Time analyse repository : $timestamp_analyse s<br>";
+	echo "Time upload dependencies : $timestamp_dependencies s<br>";
+	echo "Script full running time : $timestamp_full s<br>";
 
 
 

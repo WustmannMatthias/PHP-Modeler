@@ -1,5 +1,7 @@
 <?php
 	//A few useful constants
+
+	const TEST_REPO = "/home/wustmann/Documents/php/test_repo";
 	
 	const X_TEST_REPO_PATH = "/home/wustmann/Documents/X_test_repo";
 	
