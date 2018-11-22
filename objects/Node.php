@@ -99,12 +99,12 @@
 		*/
 		public function analyseFile() {
 			if (!file_exists($this->_path)) {
-				throw new Exception("File ".$this->_path." doesn't exist. ");
+				throw new FileNotFoundException($this->_path);
 			}
 
 			$inComment = false;
 			$lineCount = 0;
-		
+
 			$fileHandler = fopen($this->_path, 'r');
 			while (!feof($fileHandler)) {
 				$line = trim(fgets($fileHandler));
@@ -296,6 +296,7 @@
 				foreach ($variableNames as $variableName) {
 					if (startsWith(trim($line), $variableName)) {
 						$declarationLines[$variableName] = $line;
+						unset($variableNames[array_search($variableName, $variableNames)]);
 						//echo "found<br>";
 					}
 				}
@@ -303,7 +304,8 @@
 					break;
 				}
 				if ($lineCount >= $maxLine) {
-					throw new Exception("Declaration of variable $variableName not found in ".$this->getPathFromRepo($this->_path, $this->_repoName).".<br>");
+					throw new VariableDeclarationNotFoundException($this->_path, 
+						$variableNames);
 				}
 			}
 
@@ -319,7 +321,8 @@
 					$output[$variableName] = explode('"', $line)[1];
 				}
 				else {
-					echo "Ununderstood variable declaration in ".$this->_path." , line ".$lineCount.".<br>";
+					throw new UnunderstoodVariableDeclarationException($this->_path, 
+						$line);	
 				}
 			}
 			//displayArray($output);
@@ -449,9 +452,8 @@
 					$dirname = $this->removeLastDirectoryInPath($dirname);
 					$counter ++;
 					if ($counter > 20) { //Security, to avoid infinite loop
-						echo "Method fillPath not working for dependency $path of file "
-								.$this->_path." on line $lineCount. <br>";
-						break;
+						throw new AbsolutePathReconstructionException($this->_path, 
+							$path, $lineCount);
 					}
 				}
 				$path = $dirname.'/'.$path;
@@ -459,11 +461,8 @@
 			}
 
 
-				
 			if (!file_exists($path)) {
-				echo "File ".$this->_path." requires dependency $path on line $lineCount
-						but this file doesn't exists.<br>";
-				return "";
+				throw new DependencyNotFoundException($this->_path, $path, $lineCount, false);
 			}
 			
 
@@ -485,6 +484,9 @@
 			}
 
 			$newPath = implode('/', $newTab);
+			if (!file_exists($newPath)) {
+				throw new DependencyNotFoundException($this->_path, $path, $lineCount);
+			}
 			//echo "NewPath : ".$newPath;
 			//echo "<br><br>";
 			return $newPath;
@@ -725,6 +727,9 @@
 			@return is a String
 		*/
 		public function getPathFromRepo($fullPath, $repoName) {
+			if (strpos($fullPath, $repoName) === false) {
+				throw new WrongPathException($fullPath, $repoName);
+			}
 			//echo "Full path : $fullPath<br>";
 			//echo "Repo Name : $repoName<br>";
 			return $repoName.'/'.explode('/'.$repoName.'/', $fullPath)[1];

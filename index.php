@@ -14,6 +14,13 @@
 	require_once "functions/database_functions.php";
 	require_once "vendor/autoload.php";
 
+	require_once "exceptions/FileNotFoundException.php";
+	require_once "exceptions/VariableDeclarationNotFoundException.php";
+	require_once "exceptions/UnunderstoodVariableDeclarationException.php";
+	require_once "exceptions/AbsolutePathReconstructionException.php";
+	require_once "exceptions/DependencyNotFoundException.php";
+	require_once "exceptions/WrongPathException.php";
+
 	use GraphAware\Neo4j\Client\ClientBuilder;
 
 	//$repoToTest = "/home/wustmann/Documents/invoicing";
@@ -79,16 +86,41 @@
 	foreach ($files as $file) {
 		//Create Node object for each file and analyse it
 		$node = new Node($file, $repoName);
-		echo "<b>Analysing file ".$node->getPath()."</b><br>";
-		$node->analyseFile();
 
-		//Send node in database
-		$query = $node->generateUploadQuery();
-		runQuery($client, $query);
+		try {
+			try {
+				echo "<b>Analysing file ".$node->getPath()."</b><br>";
+				$node->analyseFile();
+			}
+			catch (VariableDeclarationNotFoundException $e) {
+				printException($e);
+			}
+			catch (UnunderstoodVariableDeclarationException $e) {
+				printException($e);
+			}
+			catch (AbsolutePathReconstructionException $e) {
+				printException($e);
+			}
+			catch (DependencyNotFoundException $e) {
+				printException($e);
+			}
+			
+			//Send node in database
+			$query = $node->generateUploadQuery();
+			runQuery($client, $query);
+			
+			//Save the object
+			array_push($nodes, $node);
+			echo "<br>";
+		}
+		catch (FileNotFoundException $e) {
+			printException($e);
+		}
+		catch (WrongPathException $e) {
+			printException($e);
+		}
 		
-		//Save the object
-		array_push($nodes, $node);
-		echo "<br>";
+
 	}
 	echo "<br>Done.<br><br>";
 	$timestamp_analyse = microtime(true) - $timestamp_analyse;
@@ -111,22 +143,27 @@
 	echo "<h2>STEP 2 UPLOAD DEPENDENCIES</h2>";
 	$timestamp_dependencies = microtime(true);
 	foreach ($nodes as $node) {
-		//Send include relations in database
-		$includeQuery = $node->generateIncludeRelationQuery();
-		if ($includeQuery) {
-			runQuery($client, $includeQuery);
-		}
+		try {
+			//Send include relations in database
+			$includeQuery = $node->generateIncludeRelationQuery();
+			if ($includeQuery) {
+				runQuery($client, $includeQuery);
+			}
 
-		//Send require relations in database
-		$requireQuery = $node->generateRequireRelationQuery();
-		if ($requireQuery) {
-			runQuery($client, $requireQuery);
-		}
+			//Send require relations in database
+			$requireQuery = $node->generateRequireRelationQuery();
+			if ($requireQuery) {
+				runQuery($client, $requireQuery);
+			}
 
-		//Send use relations in database
-		$useQuery = $node->generateUseRelationQuery();
-		if ($useQuery) {
-			runQuery($client, $useQuery);
+			//Send use relations in database
+			$useQuery = $node->generateUseRelationQuery();
+			if ($useQuery) {
+				runQuery($client, $useQuery);
+			}
+		}
+		catch (WrongPathException $e) {
+			printException($e);
 		}
 	}
 	echo "<br><br>";
