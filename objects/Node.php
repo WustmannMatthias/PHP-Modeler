@@ -6,7 +6,7 @@
 	*/
 
 	require_once "functions/common_functions.php";
-	require_once "constants.php";
+	require_once "constants.inc";
 	
 
 

@@ -26,11 +26,8 @@
 	require_once "exceptions/DependencyNotFoundException.php";
 	require_once "exceptions/WrongPathException.php";
 
-
-	//$repoToTest = "/home/wustmann/Documents/invoicing";
-	$repoToTest = PRICER_REALLY_SMALL_TEST_PATH;
+	require "settings";
 	
-
 
 
 
@@ -44,7 +41,7 @@
 	//Get array of every file in repo
 	$timestamp_directory = microtime(true);
 	try {
-		$files = getDirContent($repoToTest);
+		$files = getDirContent($repository);
 		$files = keepSpecificTypesOnly($files, array('.php', '.inc'));
 	}
 	catch (RepositoryScanException $e) {
@@ -53,7 +50,7 @@
 		exit();
 	}
 	
-	$repoName = getRepoName($repoToTest);
+	$repoName = getRepoName($repository);
 	$repoName = "Pricer2016Q2";
 	$timestamp_directory = microtime(true) - $timestamp_directory;
 	
@@ -64,8 +61,9 @@
 	
 	
 	/************************* DATABASE * INITIALISATION **************************/
+	$fullURL = "bolt://".$username.":".$password."@".$databaseURL.":".$databasePort;
 	$client = ClientBuilder::create()
-	    ->addConnection('bolt', 'bolt://neo4j:password@localhost:7687')
+	    ->addConnection('bolt', $fullURL)
 	    ->build();
 	runQuery($client, "MATCH (n)-[r]->(n2) DELETE r, n, n2");
 	runQuery($client, "MATCH (n) DELETE n");
