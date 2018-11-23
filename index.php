@@ -28,7 +28,7 @@
 
 
 	//$repoToTest = "/home/wustmann/Documents/invoicing";
-	$repoToTest = X_TEST_REPO_PATH;
+	$repoToTest = PRICER_REALLY_SMALL_TEST_PATH;
 	
 
 
@@ -54,7 +54,7 @@
 	}
 	
 	$repoName = getRepoName($repoToTest);
-	//$repoName = "Pricer2016Q2";
+	$repoName = "Pricer2016Q2";
 	$timestamp_directory = microtime(true) - $timestamp_directory;
 	
 
@@ -121,12 +121,12 @@
 			printAnalysisExceptionMessage($e, $node->getPath());
 		}
 		catch (WrongPathException $e) {
-			printAnalysisExceptionMessage($e, $node->getPath());
+			printQueriesGenerationExceptionMessage($e, $node->getPath());
 		}
 		
 
 	}
-	echo "<br>Done.<br><br>";
+	echo "<br>Done.<br><br><br><br><br>";
 	$timestamp_analyse = microtime(true) - $timestamp_analyse;
 
 
@@ -169,7 +169,7 @@
 			printQueriesGenerationExceptionMessage($e, $node->getPath());
 		}
 	}
-	echo "<br><br>";
+	echo "<br>Done.<br><br><br><br><br>";
 	$timestamp_dependencies = microtime(true) - $timestamp_dependencies;
 
 
@@ -186,9 +186,9 @@
 	$timestamp_full = microtime(true) - $timestamp_full;
 
 	echo "<h2>PERFORMANCES</h2>";
-	echo "Time to load repository : $timestamp_directory s<br>";
-	echo "Time analyse repository : $timestamp_analyse s<br>";
-	echo "Time upload dependencies : $timestamp_dependencies s<br>";
-	echo "Script full running time : $timestamp_full s<br>";
+	echo "Time to load repository : " .number_format($timestamp_directory, 4)	."s<br>";
+	echo "Time analyse repository : " .number_format($timestamp_analyse, 4)		."s<br>";
+	echo "Time upload dependencies : ".number_format($timestamp_dependencies, 4)."s<br>";
+	echo "Script full running time : ".number_format($timestamp_full, 4)		."s<br>";
 
 ?>
