@@ -3,7 +3,7 @@
 
 
 	//Repository to model
-	$repository 	= PRICER_REALLY_SMALL_TEST_PATH;
+	$repository 	= PRICER_PATH;
 
 	//Database informations
 	$databaseURL 	= "localhost";

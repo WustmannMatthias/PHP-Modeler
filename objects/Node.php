@@ -158,6 +158,9 @@
 				if ($this->isMagicConstantInLine($line)) {
 					$line = $this->replaceMagicConstant($line);
 				}
+				if ($subLine = $this->isShittyConstantInLine($line)) {
+					$line = $this->replaceShittyConstant($line, $subLine);
+				}
 				$line = $this->removeUnnecessary($line);
 				$line = $this->removeDoubleSlash($line);
 				$path = $this->fillPath($line, $lineCount);
@@ -177,6 +180,9 @@
 				}
 				if ($this->isMagicConstantInLine($line)) {
 					$line = $this->replaceMagicConstant($line);
+				}
+				if ($subLine = $this->isShittyConstantInLine($line)) {
+					$line = $this->replaceShittyConstant($line, $subLine);
 				}
 				$line = $this->removeUnnecessary($line);
 				$line = $this->removeDoubleSlash($line);
@@ -206,7 +212,9 @@
 			$regex = "/^use\s+[-_ A-Za-z0-9\\\]+/";
 			if (preg_match($regex, $line)) {
 				$use = $this->extractUses($line);
-				array_push($this->_uses, $use);
+				if ($use) {
+					array_push($this->_uses, $use);
+				}
 			}
 		}
 
@@ -235,6 +243,22 @@
 			}
 			return true;
 		}
+
+
+		/**
+			Check if this weird and useless pattern is used in a code line : 
+			dirname(__FILE__)
+			return it if found
+			@param $line (string) is the line to analyse
+			@return is the found pattern
+		*/
+		private function isShittyConstantInLine($line) {
+			$regex = "/dirname\s*\(\s*__FILE__\s*\)/";
+			if (preg_match($regex, $line, $result)) {
+				return $result;
+			}
+			return false;
+		}
 		
 
 		/**
@@ -258,7 +282,7 @@
 		*/
 		private function identifyVariable($line) {
 			$output = array();
-			$endVariableChar = array('.', ';', ' ');
+			$endVariableChar = array('.', ';', ' ', ')');
 			$tab = str_split($line);
 			$inVariable = false;
 			$variableName = "";
@@ -352,12 +376,27 @@
 		private function replaceMagicConstant($line) {
 			//echo $line;
 			$dirPath = str_replace($this->_name, "", $this->_path);
-			$newline = str_replace("__DIR__", '"'.$dirPath.'"', $line);
-			$newline = str_replace("dirname(__FILE__)", '"'.$dirPath.'"', $newline);
+			$newLine = str_replace("__DIR__", '"'.$dirPath.'"', $line);
+			
 			//echo "<br>".$newline."<br>";
-			return $newline;
+			return $newLine;
 		}
 
+
+		/**
+			Replace the weird pattern dirname(__FILE__) with the corresponding path
+			@param line is the line with that pattern in it (String)
+			@param subline is the exact pattern (String)
+			@return is the new line (String)
+		*/
+		private function replaceShittyConstant($line, $subLine) {
+			echo $line."<br>";
+			$dirPath = str_replace($this->_name, "", $this->_path);
+			$newLine = str_replace($subLine, '"'.$dirPath.'"', $line);
+
+			echo $newLine."<br>";
+			return $newLine;
+		}
 
 		/**
 			Help function : removes everything that is not a part of the path to a file
@@ -415,7 +454,11 @@
 		*/
 		private function extractUses($line) {
 			$line = substr($line, 0, strlen($line) - 1);
-			return trim(str_replace("use ", "", $line));
+			$argument = trim(str_replace("use ", "", $line));
+			if (strpos($argument, '\\') === false) {
+				return false;
+			}
+			return $argument;
 		}
 
 

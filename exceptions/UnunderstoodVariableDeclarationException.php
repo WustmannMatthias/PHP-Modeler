@@ -3,7 +3,7 @@
 
 		public function __construct($file, $line) {
 			$message = "File $file : Variable declaration should have been found 
-						in following line --->$line<--- but wasen't.";
+						in following line $line but wasen't.";
 
 			parent::__construct($message);
 		}

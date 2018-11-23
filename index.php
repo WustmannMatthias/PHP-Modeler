@@ -51,7 +51,7 @@
 	}
 	
 	$repoName = getRepoName($repository);
-	$repoName = "Pricer2016Q2";
+	//$repoName = "Pricer2016Q2";
 	$timestamp_directory = microtime(true) - $timestamp_directory;
 	
 
@@ -188,5 +188,6 @@
 	echo "Time analyse repository : " .number_format($timestamp_analyse, 4)		."s<br>";
 	echo "Time upload dependencies : ".number_format($timestamp_dependencies, 4)."s<br>";
 	echo "Script full running time : ".number_format($timestamp_full, 4)		."s<br>";
+	echo "<br><br>";
 
 ?>
