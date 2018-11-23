@@ -2,8 +2,8 @@
 	class VariableDeclarationNotFoundException extends Exception {
 
 		public function __construct($file, $variables) {
-			$message = "Following variable declarations weren't found in $file : ";
-			foreach ($variables as $$variable) {
+			$message = "At least one of those variable declarations weren't found in $file : ";
+			foreach ($variables as $variable) {
 				$message.= $variable." ; ";
 			}
 			$message = substr($message, 0, strlen($message) - 2);

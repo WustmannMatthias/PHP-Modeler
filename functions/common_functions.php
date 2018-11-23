@@ -48,16 +48,5 @@
 	}
 
 
-	/**
-		Just display properly an Exception
-		@param e is a instance or child of class Exception
-		@return is a String
-	*/
-		function printException($e) {
-			$output = "<b>Exception found in ".$e->getFile()." line ".$e->getLine()." : ";
-			$output.= $e->getMessage()."<br>";
-			return $output;
-		}
-
 
 ?>

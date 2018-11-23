@@ -1,5 +1,6 @@
 <?php
-
+	require_once "exceptions/RepositoryScanException.php";
+	
 	/**
 		Scans (recursively) a directory and returns all complete filenames within it in an array
 		@param dir is the path to a directory to scan
@@ -8,10 +9,10 @@
 	*/
 	function scanDirectory($dir, $tab=array()) {
 		if (!is_dir($dir)) { //is it a directory ?
-			throw new Exception("$dir is not a directory");
+			throw new RepositoryScanException("$dir is not a directory");
 		}
 		if (!($dh = opendir($dir))) { //do we have access rights ?
-			throw new Exception("Access denied to $dir");	
+			throw new RepositoryScanException("Access denied to $dir");	
 		}
 		
 		$dirsInDir = array(); //To save directories in current directory
@@ -43,12 +44,21 @@
 
 
 
+
+
 	/**
 		new recursive function to scan the directory, much more efficient.
 		@param dir is the path to a directory to scan (String)
 		@param results is the array ot store the results in
 	*/
 	function getDirContent($dir, &$results = array()){
+		if (!is_dir($dir)) { //is it a directory ?
+			throw new RepositoryScanException("$dir is not a directory");
+		}
+		if (!is_readable($dir)) { //do we have access rights ?
+			throw new RepositoryScanException("Access denied to $dir");	
+		}
+
 		$files = scandir($dir);
 
 		foreach($files as $file){

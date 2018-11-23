@@ -120,10 +120,11 @@
 					else $inComment = false;
 				}
 
-				$this->analyseIncludes($line, $lineCount);
-				$this->analyseRequires($line, $lineCount);
 				$this->analyseNameSpaces($line);
 				$this->analyseUses($line);
+				$this->analyseIncludes($line, $lineCount);
+				$this->analyseRequires($line, $lineCount);
+				
 			}
 		}
 
@@ -296,7 +297,6 @@
 				foreach ($variableNames as $variableName) {
 					if (startsWith(trim($line), $variableName)) {
 						$declarationLines[$variableName] = $line;
-						unset($variableNames[array_search($variableName, $variableNames)]);
 						//echo "found<br>";
 					}
 				}
@@ -457,7 +457,7 @@
 					}
 				}
 				$path = $dirname.'/'.$path;
-				echo $path."<br>";
+				//echo $path."<br>";
 			}
 
 

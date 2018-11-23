@@ -8,11 +8,16 @@
 	error_reporting(E_ALL);
 	$timestamp_full = microtime(true);
 
+	require_once "vendor/autoload.php";
+	
+	use GraphAware\Neo4j\Client\ClientBuilder;
+
 	require_once "objects/Node.php";
+
 	require_once "functions/common_functions.php";
 	require_once "functions/repo_scan_functions.php";
 	require_once "functions/database_functions.php";
-	require_once "vendor/autoload.php";
+	require_once "functions/display_exceptions_functions.php";
 
 	require_once "exceptions/FileNotFoundException.php";
 	require_once "exceptions/VariableDeclarationNotFoundException.php";
@@ -21,7 +26,6 @@
 	require_once "exceptions/DependencyNotFoundException.php";
 	require_once "exceptions/WrongPathException.php";
 
-	use GraphAware\Neo4j\Client\ClientBuilder;
 
 	//$repoToTest = "/home/wustmann/Documents/invoicing";
 	$repoToTest = X_TEST_REPO_PATH;
@@ -41,12 +45,14 @@
 	$timestamp_directory = microtime(true);
 	try {
 		$files = getDirContent($repoToTest);
+		$files = keepSpecificTypesOnly($files, array('.php', '.inc'));
 	}
-	catch (Exception $e) {
-		echo "Exception while scanning directory : ".$e->getMessage();
-		exit;
+	catch (RepositoryScanException $e) {
+		printExceptionMessage($e);
+		echo "Can't scan repository. Program end.<br>";
+		exit();
 	}
-	$files = keepSpecificTypesOnly($files, array('.php', '.inc'));
+	
 	$repoName = getRepoName($repoToTest);
 	//$repoName = "Pricer2016Q2";
 	$timestamp_directory = microtime(true) - $timestamp_directory;
@@ -89,20 +95,19 @@
 
 		try {
 			try {
-				echo "<b>Analysing file ".$node->getPath()."</b><br>";
 				$node->analyseFile();
 			}
 			catch (VariableDeclarationNotFoundException $e) {
-				printException($e);
+				printAnalysisExceptionMessage($e, $node->getPath());
 			}
 			catch (UnunderstoodVariableDeclarationException $e) {
-				printException($e);
+				printAnalysisExceptionMessage($e, $node->getPath());
 			}
 			catch (AbsolutePathReconstructionException $e) {
-				printException($e);
+				printAnalysisExceptionMessage($e, $node->getPath());
 			}
 			catch (DependencyNotFoundException $e) {
-				printException($e);
+				printAnalysisExceptionMessage($e, $node->getPath());
 			}
 			
 			//Send node in database
@@ -111,13 +116,12 @@
 			
 			//Save the object
 			array_push($nodes, $node);
-			echo "<br>";
 		}
 		catch (FileNotFoundException $e) {
-			printException($e);
+			printAnalysisExceptionMessage($e, $node->getPath());
 		}
 		catch (WrongPathException $e) {
-			printException($e);
+			printAnalysisExceptionMessage($e, $node->getPath());
 		}
 		
 
@@ -137,8 +141,7 @@
 	********************************************************************************
 	*******************************************************************************/
 	/**
-		STEP 2 : Read informations stored in every node, find dependencies, and
-		create relationsships in database.
+		STEP 2 : Read informations stored in every node, send relations in database.
 	*/
 	echo "<h2>STEP 2 UPLOAD DEPENDENCIES</h2>";
 	$timestamp_dependencies = microtime(true);
@@ -163,7 +166,7 @@
 			}
 		}
 		catch (WrongPathException $e) {
-			printException($e);
+			printQueriesGenerationExceptionMessage($e, $node->getPath());
 		}
 	}
 	echo "<br><br>";
