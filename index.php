@@ -25,7 +25,7 @@
 	require_once "exceptions/AbsolutePathReconstructionException.php";
 	require_once "exceptions/DependencyNotFoundException.php";
 	require_once "exceptions/WrongPathException.php";
-
+	
 	require "settings";
 	
 

@@ -1,4 +1,5 @@
 <?php 
+
 	class WrongPathException extends Exception {
 		
 		public function __construct($fullPath, $repoName) {

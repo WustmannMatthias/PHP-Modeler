@@ -1,4 +1,5 @@
 <?php
+	
 	class UnunderstoodVariableDeclarationException extends Exception {
 
 		public function __construct($file, $line) {

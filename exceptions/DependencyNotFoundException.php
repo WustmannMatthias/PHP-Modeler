@@ -1,4 +1,5 @@
 <?php 
+
 	class DependencyNotFoundException extends Exception {
 		
 		public function __construct($file, $dependency, $line) {

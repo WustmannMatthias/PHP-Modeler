@@ -1,4 +1,5 @@
 <?php 
+
 	class AbsolutePathReconstructionException extends Exception {
 		
 		public function __construct($file, $dependency, $line) {
