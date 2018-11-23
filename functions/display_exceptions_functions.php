@@ -31,4 +31,21 @@
 
 
 	
+	/**
+		Function to display properly an Exception thrown by the neo4j API
+		@param e is a instance of the Exception
+		@return is a String
+	*/
+	function printDatabaseExceptionMessage($e) {
+		$output = "neo4j API exception : <br>";
+		$class 	= get_class($e);
+		$output.= "<b>$class</b> : ".
+		$output.="==> ".$e->getMessage()."<br><br>";
+		echo $output;
+	}
+
+
+
+
+	
 ?>
