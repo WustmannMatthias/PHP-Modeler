@@ -676,11 +676,14 @@
 			$queryEnd	= "";
 
 			$counter = 0;
-			foreach ($uses as $namespace => $className) {
+			foreach ($uses as $namespace => $classNames) {
 				$counter ++;
+
+				$classNamesInString = $this->prepareClassNames($classNames);
+
 				$queryBegin	.= "MERGE (n".$counter.":Namespace {name: '$namespace'}) ";
 				$queryEnd	.= "CREATE (n".$counter.")-[:$useRelation {class: 
-								'$className'}]->(f) ";
+								$classNamesInString}]->(f) ";
 			}
 
 			$query = $queryBegin.$queryEnd;
@@ -690,10 +693,11 @@
 
 
 		/**
+			Help function for generateUseRelationQuery : 
 			Prepare an array with all use arguments ready to be sent in database
-			@return is an array : namespace => className
+			@return is an array : namespace => array(className1, className2, etc)
 		*/
-		public function prepareUses() {
+		private function prepareUses() {
 			$uses = array();
 
 			foreach ($this->_uses as $use) {
@@ -701,12 +705,37 @@
 				$class = $tab[sizeof($tab) - 1];
 				$tab = array_trim_end($tab);
 				$namespace = implode('\\\\', $tab);
-				$uses[$namespace] = $class;
+				
+				if(!isset($uses[$namespace])) {
+					$uses[$namespace] = array($class);
+				}
+				else {
+					array_push($uses[$namespace], $class);
+				}
 			}
 
 			return $uses;
 		}
 
+
+		/**
+			Help function for generateUseRelationQuery : 
+			Prepare the String in Cypher Syntax corresponding to the parameters of a 
+			relation use in Database
+			@param classNames is an array of classes
+			@return is a String like [class1, class2, class3]
+		*/
+		private function prepareClassNames($classNames) {
+			$output = "[";
+
+			foreach ($classNames as $class) {
+				$output.="'".$class."', ";
+			}
+			$output = substr($output, 0, strlen($output) - 2);
+			$output.= "]";
+
+			return $output;
+		}
 
 
 

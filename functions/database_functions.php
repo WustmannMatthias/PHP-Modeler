@@ -11,7 +11,11 @@ function runQuery($client, $query) {
 		$result = $client->run($query);
 	}
 	catch (GraphAware\Bolt\Exception\IOException $e) {
-		echo "GraphAware\Bolt\Exception\IOException : ".$e->getMessage()."<br>";
+		echo "<b>GraphAware\Bolt\Exception\IOException</b> : ".$e->getMessage()."<br>";
+	}
+	catch (GraphAware\Neo4j\Client\Exception\Neo4jException $e) {
+		echo "<b>GraphAware\Neo4j\Client\Exception\Neo4jException</b> : ".$e->getMessage()
+			."<br>";
 	}
 	return $result;
 }
