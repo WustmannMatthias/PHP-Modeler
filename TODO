@@ -133,7 +133,8 @@ Il a d'abord fallu apprendre les notions de namespace en php. Une classe, une va
 			-> On ajoute les relations IS_USED_BY entre les namespaces et les fichiers sans vérifier si le namespace existe déjà dans la base (on matche le NS avec la clause MERGE)
 		- Par la suite, on pourra déceler les namespaces orphelins très simplement, car aucun fichier n'aura de relation DECLARES pointant sur lui.
 		- Ainsi, il suffit de reprendre les méthodes generateIncludeRelationQuery et generateRequireRelationQuery et de les adapter aux relations des use.
-		- Au cas ou ça serve à un moment, on stocke les classes aliassées par le use dans les propriétés de la relation
+		- Au cas ou ça serve à un moment, on stocke les classes aliassées par le use dans les propriétés de la relation, sous la forme d'un tableau de String
+	- A prendre en compte, que, si un use ne comporte qu'un item dans son paramètre (ex: use Exception;), alors il réfère à une classe du namespace global. Il ne faut donc pas l'inclure dans la modélisation 
 
 
 
@@ -156,6 +157,21 @@ ETAPE 6 : Commencer à préparer des requêtes qui sortiront des éléments int�
 	-> Les éléments en tête d'architecture
 	-> Les fichiers impactées par un fichier donné
 
+
+
+
+
+AUTRES ETAPES : 
+	Le problème avec ce projet d'analyse statique de code est qu'en fonction des fichiers/repository testés, on rencontre de nouveaux cas particuliers à prendre en compte. 
+	Cette étape est donc réalisée au fur et à mesure que ces exceptions se rencontrent.
+	Par exemple : 
+		- Il peut y avoir des () autour des include -> à détecter puis supprimer
+		- la constante __DIR__ peut être utilisée dans un chemin d'accès -> à remplacer par le chemin d'accès jusqu'au dossier dans lequel se trouve le fichier en cours d'analyse.
+		- le pattern dirname(__FILE__) est équivent à la constante précédente
+		- les variables dans les arguments des include peuvent être multiples -> a prendre en compte pour toutes les remplacer
+		- ces variables peut être séparées par des opérateurs de concaténation, mais peuvent aussi être dans une chaine (ex: inlcude "machin/$var/machin") -> a prendre en compte également
+		- Les variables peuvent être des variables de php (ex: $_SERVER['kjdd']) -> impossible à prendre en ocmpte car je n'exécute pas le code, mais il faut indiquer quelque part que ce include n'est pas pris en compte dans la mdélisation.
+		- Les variables peuvent être des attributs d'un objet $objet->_attribut, auquel cas rechercher la déclaration devient plus compliquée.
 
 
 
