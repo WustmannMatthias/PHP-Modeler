@@ -3,7 +3,7 @@
 
 
 	//Repository to model
-	$repository 	= X_TEST_REPO_PATH;
+	$repository = PRICER_PATH;
 
 	//Database informations
 	$databaseURL 	= "localhost";

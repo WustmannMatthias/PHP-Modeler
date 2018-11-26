@@ -141,8 +141,22 @@ Il a d'abord fallu apprendre les notions de namespace en php. Une classe, une va
 
 
 
+ETAPE 5 : Prendre partiellement en compte le vendor
 
-ETAPE 5 : Ajouter des index et des constraints au graph (petite étape)
+Il faut ajouter a la bdd tous les namespaces du vendor, mais ne pas ajouter les neuds File, Feature, ni les relations entre les fichiers.
+	-> Création d'un attribut _inVendor dans la classe Node, qui correspondra a si le noeud est ou non dans un sous répertoire du dossier vendor
+	-> Dans la méthode analyse File, n'effectuer les analyses de Features, Include, Use et Require uniquement si _inVendor vaut false
+	-> Dans la méthode generateUploadQuery, sélectionner les éléments a envoyer dans la base en fonction de si le fichier est dans le vendor ou non
+	-> Pour les namespaces déclarés dans le vendor, ajouter un attribut inVendor valant True si le namespace est déclaré dans le vendor
+	-> On pourra ainsi décéler les relations USE vers des namespaces non déclarés en écrivant une requete du type 
+		Matcher les namespaces n'ayant aucune relations DECLARE pointant sur eux et n'ayant pas d'attribut inVendor
+
+
+
+
+
+
+ETAPE 6 : Ajouter des index et des constraints au graph (petite étape)
 
 Il faudra d'abord lire attentivement la documentation afin de comprendre ce que sont les index, et pourquoi peuvent ils être intéressants et utiles.
 
@@ -152,7 +166,7 @@ Il faudra d'abord lire attentivement la documentation afin de comprendre ce que 
 
 
 
-ETAPE 6 : Commencer à préparer des requêtes qui sortiront des éléments intéressants du graph : 
+ETAPE 7 : Commencer à préparer des requêtes qui sortiront des éléments intéressants du graph : 
 	-> Les fichiers orphelins
 	-> Les éléments en tête d'architecture
 	-> Les fichiers impactées par un fichier donné

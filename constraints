@@ -1,4 +1,4 @@
-ON ( file:File ) ASSERT file.name IS UNIQUE
+ON ( file:File ) ASSERT file.path IS UNIQUE
 ON ( feature:Feature ) ASSERT feature.name IS UNIQUE
 ON ( namespace:Namespace ) ASSERT namespace.name IS UNIQUE
 

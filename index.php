@@ -26,7 +26,7 @@
 	require_once "exceptions/DependencyNotFoundException.php";
 	require_once "exceptions/WrongPathException.php";
 	
-	require "settings";
+	require "settings.php";
 	
 
 
@@ -45,7 +45,8 @@
 		$files = keepSpecificTypesOnly($files, array('.php', '.inc'));
 	}
 	catch (RepositoryScanException $e) {
-		printExceptionMessage($e);
+		echo $e->getMessage();
+		echo "<br>";
 		echo "Can't scan repository. Program end.<br>";
 		exit();
 	}
@@ -108,8 +109,10 @@
 			}
 			
 			//Send node in database
-			$query = $node->generateUploadQuery();
-			runQuery($client, $query);
+			$uploadQuery = $node->generateUploadQuery();
+			if ($uploadQuery) {
+				runQuery($client, $uploadQuery);
+			}
 			
 			//Save the object
 			array_push($nodes, $node);
@@ -182,8 +185,10 @@
 
 	echo "<h2>PERFORMANCES</h2>";
 	echo "Time to load repository : " .number_format($timestamp_directory, 4)	."s<br>";
-	echo "Time analyse repository : " .number_format($timestamp_analyse, 4)		."s<br>";
-	echo "Time upload dependencies : ".number_format($timestamp_dependencies, 4)."s<br>";
+	echo "Time to analyse repository : " 
+		.number_format($timestamp_analyse, 4)		."s<br>";
+	echo "Time to upload dependencies : "
+		.number_format($timestamp_dependencies, 4)."s<br>";
 	echo "Script full running time : ".number_format($timestamp_full, 4)		."s<br>";
 	echo "<br><br>";
 

@@ -23,6 +23,7 @@
 		private $_extension;
 		private $_lastModified;
 		private $_repoName;
+		private $_inVendor;
 		
 		private $_features;
 
@@ -47,6 +48,7 @@
 			$this->_extension		= $this->pickUpExtension($path);
 			$this->_size 			= $this->pickUpSize($path);
 			$this->_lastModified 	= $this->pickUpLastModified($path);
+			$this->_inVendor		= $this->isInVendor();
 			
 			$this->_features		= array();
 			
@@ -94,6 +96,10 @@
 			- outside classes used
 			- declared namespaces
 			- declared features
+
+			However, if the file belongs to the vendor directory, we care only about the
+			declared namespaces, because we don't need to represent relations between 
+			dependency files.
 		*/
 		public function analyseFile() {
 			if (!file_exists($this->_path)) {
@@ -108,22 +114,36 @@
 				$line = trim(fgets($fileHandler));
 				$lineCount ++;
 
-				$this->analyseFeatures($line);
-				
-				// Comments handling
-				if (startsWith($line, "//")) continue;
-				if (startsWith($line, "/*")) $inComment = true;
-				if ($inComment) {
-					if (strpos($line, "*/") === false) continue;
-					else $inComment = false;
+				if ($this->_inVendor) {
+					$this->analyseNameSpaces($line);
 				}
+				else {
+					$this->analyseFeatures($line);
+					
+					// Comments handling
+					if (startsWith($line, "//")) continue;
+					if (startsWith($line, "/*")) $inComment = true;
+					if ($inComment) {
+						if (strpos($line, "*/") === false) continue;
+						else $inComment = false;
+					}
 
-				$this->analyseNameSpaces($line);
-				$this->analyseUses($line);
-				$this->analyseIncludes($line, $lineCount);
-				$this->analyseRequires($line, $lineCount);
-				
+					$this->analyseNameSpaces($line);
+					$this->analyseUses($line);
+					$this->analyseIncludes($line, $lineCount);
+					$this->analyseRequires($line, $lineCount);
+				}
 			}
+		}
+
+
+		/**
+			Tells if the file is in the vendor directory
+			@return is a bool
+		*/
+		private function isInVendor() {
+			$pathFromRepo = $this->getPathFromRepo($this->_path, $this->_repoName);
+			return startsWith($pathFromRepo, $this->_repoName.'/vendor');
 		}
 
 		/**
@@ -388,11 +408,9 @@
 			@return is the new line (String)
 		*/
 		private function replaceShittyConstant($line, $subLine) {
-			echo $line."<br>";
 			$dirPath = str_replace($this->_name, "", $this->_path);
 			$newLine = str_replace($subLine, '"'.$dirPath.'"', $line);
 
-			echo $newLine."<br>";
 			return $newLine;
 		}
 
@@ -594,35 +612,57 @@
 		/**
 			Generates à Cypher Query that creates a Node for this instance in the 
 			neo4j Database
-			@return is a String
+			If the file belongs to the vendor directory, it must not be added to the graph.
+			However, the namespaces it contains has to be.
+
+			@return is a either a bool or a String
 		*/
 		public function generateUploadQuery() {
+			//In this case, query would be null -> return false to avoid useless
+			//operations
+			if ($this->_inVendor && sizeof($this->_namespaces) == 0) {
+				return false;
+			}
+
 			//Create Node
 			$featureRelation = "IMPACTS";
 			$namespaceRelation = "DECLARES";
+			$query = "";
 
-			$query = "CREATE (n:File {name: '".$this->_name
-								."', path: '".$this->getPathFromRepo($this->_path, 
-									$this->_repoName)
-								."', size: '".$this->_size
-								."', lastModified: '".$this->_lastModified
-								."', extension: '".$this->_extension
-								."'}) ";
+			if (!$this->_inVendor) {
+				$query.= "CREATE (n:File {name: '".$this->_name
+									."', path: '".$this->getPathFromRepo($this->_path, 
+										$this->_repoName)
+									."', size: '".$this->_size
+									."', lastModified: '".$this->_lastModified
+									."', extension: '".$this->_extension
+									."'}) ";
+			}
 
 			//Foreach of his features, create Node and relationship if not already exists
-			$counter = 0;								
-			foreach ($this->_features as $feature) {
-				$counter ++;
-				$query.= "MERGE (f".$counter.":Feature {name: '$feature'}) ";
-				$query.= "CREATE (n)-[:".$featureRelation."]->(f".$counter.") ";
+			if (!$this->_inVendor) {
+				$counter = 0;								
+				foreach ($this->_features as $feature) {
+					$counter ++;
+					$query.= "MERGE (f".$counter.":Feature {name: '$feature'}) ";
+					$query.= "CREATE (n)-[:".$featureRelation."]->(f".$counter.") ";
+				}
 			}
 
 			//Foreach of his namespaces, create Node and relationship if not already exists
 			$counter = 0;
 			foreach ($this->doubleBackSlashes($this->_namespaces) as $namespace) {
 				$counter ++;
-				$query.= "MERGE (ns".$counter.":Namespace {name: '$namespace'}) ";
-				$query.= "CREATE (n)-[:".$namespaceRelation."]->(ns".$counter.") ";	
+				$query.= "MERGE (ns".$counter.":Namespace {name: '$namespace'";
+				
+				if ($this->_inVendor) {
+					$query.= ", inVendor: True";
+				}
+				$query.= "}) ";
+
+				if (!$this->_inVendor) {
+					$query.= "CREATE (n)-[:".$namespaceRelation."]->(ns".$counter.") ";	
+				}
 			}
 
 			//echo $query."<br>";
@@ -781,13 +821,13 @@
 
 
 
+
+
 		/*******************************************************************************
 		********************************************************************************
 		********************************** ACCESSORS ***********************************
 		********************************************************************************
 		*******************************************************************************/
-
-
 
 
 
@@ -820,6 +860,14 @@
 			return $this->_path;
 		}
 
+
+		/**
+			Accessor for private attribute _inVendor
+			@return is a bool
+		*/
+		public function getInVendor() {
+			return $this->_inVendor;
+		}
 
 
 		/**
