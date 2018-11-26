@@ -48,7 +48,7 @@
 			$this->_extension		= $this->pickUpExtension($path);
 			$this->_size 			= $this->pickUpSize($path);
 			$this->_lastModified 	= $this->pickUpLastModified($path);
-			$this->_inVendor		= $this->isInVendor();
+			$this->_inVendor		= Node::isInVendor($path, $repoName);
 			
 			$this->_features		= array();
 			
@@ -73,7 +73,7 @@
 			return date('d.m.Y H:i:s', filemtime($path));
 		}
 		private function pickUpExtension($path) {
-			return @end(explode('.', $path));
+			return @pathinfo($path)['extension'];
 		}
 
 
@@ -141,9 +141,9 @@
 			Tells if the file is in the vendor directory
 			@return is a bool
 		*/
-		private function isInVendor() {
-			$pathFromRepo = $this->getPathFromRepo($this->_path, $this->_repoName);
-			return startsWith($pathFromRepo, $this->_repoName.'/vendor');
+		private static function isInVendor($path, $repoName) {
+			$pathFromRepo = Node::getPathFromRepo($path, $repoName);
+			return startsWith($pathFromRepo, $repoName.'/vendor');
 		}
 
 		/**
@@ -183,7 +183,9 @@
 				$line = $this->removeDoubleSlash($line);
 				$path = $this->fillPath($line, $lineCount);
 
-				array_push($this->_includes, $path);
+				if (!Node::isInVendor($path, $this->_repoName)) {
+					array_push($this->_includes, $path);
+				}
 			}
 		}
 
@@ -206,7 +208,9 @@
 				$line = $this->removeDoubleSlash($line);
 				$path = $this->fillPath($line, $lineCount);
 
-				array_push($this->_requires, $path);
+				if (!Node::isInVendor($path, $this->_repoName)) {
+					array_push($this->_requires, $path);
+				}
 			}
 		}
 
@@ -631,7 +635,7 @@
 
 			if (!$this->_inVendor) {
 				$query.= "CREATE (n:File {name: '".$this->_name
-									."', path: '".$this->getPathFromRepo($this->_path, 
+									."', path: '".Node::getPathFromRepo($this->_path, 
 										$this->_repoName)
 									."', size: '".$this->_size
 									."', lastModified: '".$this->_lastModified
@@ -684,13 +688,13 @@
 				return false;
 			}
 			$includeRelation = "IS_INCLUDED_BY";
-			$path 		= $this->getPathFromRepo($this->_path, $this->_repoName);
+			$path 		= Node::getPathFromRepo($this->_path, $this->_repoName);
 			$queryBegin = "MATCH (ni:File {path: '".$path."'}) " ;
 			$queryEnd	= "";
 
 			$iCounter = 0;
 			foreach ($this->_includes as $include) {
-				$includePath = $this->getPathFromRepo($include, $this->_repoName);
+				$includePath = Node::getPathFromRepo($include, $this->_repoName);
 				$iCounter ++;
 				$queryBegin .= "MATCH (ni".$iCounter.":File {path: '$includePath'}) ";
 				$queryEnd 	.= "CREATE (ni".$iCounter.")-[ri".$iCounter.":"
@@ -716,13 +720,13 @@
 
 			$requireRelation = "IS_REQUIRED_BY";
 
-			$path 		= $this->getPathFromRepo($this->_path, $this->_repoName);
+			$path 		= Node::getPathFromRepo($this->_path, $this->_repoName);
 			$queryBegin = "MATCH (nr:File {path: '".$path."'}) " ;
 			$queryEnd	= "";
 
 			$rCounter = 0;
 			foreach ($this->_requires as $require) {
-				$requirePath = $this->getPathFromRepo($require, $this->_repoName);
+				$requirePath = Node::getPathFromRepo($require, $this->_repoName);
 				$rCounter ++;
 				$queryBegin .= "MATCH (nr".$rCounter.":File {path: '$requirePath'}) ";
 				$queryEnd 	.= "CREATE (nr".$rCounter.")-[rr".$rCounter.":"
@@ -752,7 +756,7 @@
 
 			$useRelation = "IS_USED_BY";
 
-			$path 		= $this->getPathFromRepo($this->_path, $this->_repoName);
+			$path 		= Node::getPathFromRepo($this->_path, $this->_repoName);
 			$queryBegin = "MATCH (f:File {path: '".$path."'}) " ;
 			$queryEnd	= "";
 
@@ -836,7 +840,7 @@
 			Delete the part of the part before the repo name
 			@return is a String
 		*/
-		public function getPathFromRepo($fullPath, $repoName) {
+		public static function getPathFromRepo($fullPath, $repoName) {
 			if (strpos($fullPath, $repoName) === false) {
 				throw new WrongPathException($fullPath, $repoName);
 			}

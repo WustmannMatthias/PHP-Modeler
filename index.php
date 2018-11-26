@@ -41,8 +41,8 @@
 	//Get array of every file in repo
 	$timestamp_directory = microtime(true);
 	try {
-		$files = getDirContent($repository);
-		$files = keepSpecificTypesOnly($files, array('.php', '.inc'));
+		$files = getDirContent($repository, array('.git', '.', '..'));
+		$files = keepSpecificTypesOnly($files, array('.php', '.inc'), true);
 	}
 	catch (RepositoryScanException $e) {
 		echo $e->getMessage();
@@ -89,7 +89,13 @@
 	$nodes = array();
 	foreach ($files as $file) {
 		//Create Node object for each file and analyse it
-		$node = new Node($file, $repoName);
+		try {
+			$node = new Node($file, $repoName);
+		}
+		catch (WrongPathException $e) {
+			printQueriesGenerationExceptionMessage($e, $node->getPath());
+			continue;
+		}
 
 		try {
 			try {
@@ -107,6 +113,9 @@
 			catch (DependencyNotFoundException $e) {
 				printAnalysisExceptionMessage($e, $node->getPath());
 			}
+			catch (WrongPathException $e) {
+				printAnalysisExceptionMessage($e, $node->getPath());
+			}
 			
 			//Send node in database
 			$uploadQuery = $node->generateUploadQuery();
@@ -119,9 +128,6 @@
 		}
 		catch (FileNotFoundException $e) {
 			printAnalysisExceptionMessage($e, $node->getPath());
-		}
-		catch (WrongPathException $e) {
-			printQueriesGenerationExceptionMessage($e, $node->getPath());
 		}
 		
 

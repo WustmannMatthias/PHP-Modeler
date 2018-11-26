@@ -51,7 +51,8 @@
 		@param dir is the path to a directory to scan (String)
 		@param results is the array ot store the results in
 	*/
-	function getDirContent($dir, &$results = array()){
+	function getDirContent($dir, $subDirectoriesToIgnore=array('.', '..'), 
+							&$results=array()) {
 		if (!is_dir($dir)) { //is it a directory ?
 			throw new RepositoryScanException("$dir is not a directory");
 		}
@@ -61,12 +62,12 @@
 
 		$files = scandir($dir);
 
-		foreach($files as $file){
-			$path = realpath($dir.DIRECTORY_SEPARATOR.$file);
+		foreach($files as $item){
+			$path = realpath($dir.DIRECTORY_SEPARATOR.$item);
 			if(!is_dir($path)) {
 				array_push($results, $path);
-			} else if($file != "." && $file != "..") {
-				getDirContent($path, $results);
+			} else if(!in_array($item, $subDirectoriesToIgnore)) {
+				getDirContent($path, $subDirectoriesToIgnore, $results);
 			}
 		}
 
@@ -77,12 +78,19 @@
 
 	/**
 		Take a filenames array and return a new array containing only file with one of the given extensions. 
-		@param filenames and extensions are arrays
+		@param filenames is an array
+		@param extensions is an array
+		@param keepNoExtension is a bool, allows to also put files without extensions 
+			in the returned array
 		@return is an array
 	*/
-	function keepSpecificTypesOnly($filenames, $extensions) {
+	function keepSpecificTypesOnly($filenames, $extensions, $keepNoExtension=false) {
 		$output = array();
 		 foreach ($filenames as $filename) {
+		 	if ($keepNoExtension && strpos(basename($filename), '.') === false) {
+		 		array_push($output, $filename);
+		 		continue;
+		 	} 
 		 	foreach ($extensions as $extension) {
 		 		if (endswith($filename, $extension)) {
 					array_push($output, $filename);
