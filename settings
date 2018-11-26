@@ -1,0 +1,26 @@
+##############################
+##### CONFIGURATION FILE #####
+##############################
+
+
+#Absolute path to the repository to analyse
+REPOSITORY = /home/wustmann/Documents/php/application_modeling_2.0
+
+
+#Information to connect to database
+DATABASE_URL = localhost
+DATABASE_PORT = 7687
+USERNAME = neo4j
+PASSWORD = "password"
+
+
+#Sub-directories to ignore, separated with commas
+SUB_DIRECTORIES = .git
+
+
+#Extensions of files to analyse, separated with commas
+EXTENSIONS = php, inc, conf
+
+
+#Do you wish files without extensions to be model as well ?
+NO_EXTENSION_FILES = true

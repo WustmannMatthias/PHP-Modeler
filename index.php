@@ -26,8 +26,11 @@
 	require_once "exceptions/DependencyNotFoundException.php";
 	require_once "exceptions/WrongPathException.php";
 	
-	require "settings.php";
 	
+
+
+	//Get user settings
+	require "parse_settings.php";
 
 
 
@@ -41,8 +44,8 @@
 	//Get array of every file in repo
 	$timestamp_directory = microtime(true);
 	try {
-		$files = getDirContent($repository, array('.git', '.', '..'));
-		$files = keepSpecificTypesOnly($files, array('.php', '.inc'), true);
+		$files = getDirContent($repository, $subDirectoriesToIgnore);
+		$files = keepSpecificTypesOnly($files, $extensions, $noExtensionFiles);
 	}
 	catch (RepositoryScanException $e) {
 		echo $e->getMessage();
@@ -52,7 +55,6 @@
 	}
 	
 	$repoName = getRepoName($repository);
-	//$repoName = "Pricer2016Q2";
 	$timestamp_directory = microtime(true) - $timestamp_directory;
 	
 
@@ -190,12 +192,12 @@
 	$timestamp_full = microtime(true) - $timestamp_full;
 
 	echo "<h2>PERFORMANCES</h2>";
-	echo "Time to load repository : " .number_format($timestamp_directory, 4)	."s<br>";
+	echo "Time to load repository : ".number_format($timestamp_directory, 4)."s<br>";
 	echo "Time to analyse repository : " 
-		.number_format($timestamp_analyse, 4)		."s<br>";
+		.number_format($timestamp_analyse, 4)."s<br>";
 	echo "Time to upload dependencies : "
 		.number_format($timestamp_dependencies, 4)."s<br>";
-	echo "Script full running time : ".number_format($timestamp_full, 4)		."s<br>";
+	echo "Script full running time : ".number_format($timestamp_full, 4)."s<br>";
 	echo "<br><br>";
 
 ?>

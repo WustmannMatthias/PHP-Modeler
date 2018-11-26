@@ -16,4 +16,6 @@
 	const PRICER_REALLY_SMALL_TEST_PATH = "/home/wustmann/Documents/Pricer2016Q2/intranet/Shaq/Batch";
 
 	const FEATURE_DEFINITION = "§§";
+
+	const PARAMETERS_SEPARATOR = ",";
 ?>

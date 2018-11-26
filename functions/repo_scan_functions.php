@@ -84,10 +84,10 @@
 			in the returned array
 		@return is an array
 	*/
-	function keepSpecificTypesOnly($filenames, $extensions, $keepNoExtension=false) {
+	function keepSpecificTypesOnly($filenames, $extensions, $keepNoExtensionFiles=false) {
 		$output = array();
 		 foreach ($filenames as $filename) {
-		 	if ($keepNoExtension && strpos(basename($filename), '.') === false) {
+		 	if ($keepNoExtensionFiles && strpos(basename($filename), '.') === false) {
 		 		array_push($output, $filename);
 		 		continue;
 		 	} 
