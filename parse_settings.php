@@ -1,6 +1,5 @@
 <?php
 	require_once 'functions/common_functions.php';
-	require_once 'constants.inc';
 
 
 	$settings = parse_ini_file("settings", true, INI_SCANNER_NORMAL);
@@ -13,7 +12,7 @@
 	*/
 	function parseParameters($parameters) {
 		$output = array();
-		$parametersArray = explode(PARAMETERS_SEPARATOR, $parameters);
+		$parametersArray = explode(',', $parameters);
 		foreach ($parametersArray as $parameter) {
 			array_push($output, trim($parameter));
 		}
@@ -21,20 +20,28 @@
 	}
 
 	$repository = $settings['REPOSITORY'];
+	if (endswith($repository, '/')) {
+		$repository = substr($repository, 0, strlen($repository) - 1);
+	}
 
 	$databaseURL = $settings['DATABASE_URL'];
 	$databasePort = $settings['DATABASE_PORT'];
 	$username = $settings['USERNAME'];
 	$password = $settings['PASSWORD'];
 	
-	$subDirectoriesToIgnore = parseParameters($settings['SUB_DIRECTORIES']);
-	array_push($subDirectoriesToIgnore, '.', '..');
-	$subDirectoriesToIgnore = array_unique($subDirectoriesToIgnore);
-	
 	$extensions = parseParameters($settings['EXTENSIONS']);
 	
 	$noExtensionFiles = $settings['NO_EXTENSION_FILES'];
 
+	$featureSyntax = $settings['FEATURE_SYNTAX'];
+
+	$subDirectoriesToIgnore = parseParameters($settings['SUB_DIRECTORIES']);
+	array_push($subDirectoriesToIgnore, '.', '..');
+	$subDirectoriesToIgnore = array_unique($subDirectoriesToIgnore);
+
+	$filesToIgnore = parseParameters($settings['FILES']);
+	
+	
 
 	//displayArray($settings);
 

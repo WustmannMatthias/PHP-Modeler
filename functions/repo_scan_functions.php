@@ -16,7 +16,7 @@
 		}
 		
 		$dirsInDir = array(); //To save directories in current directory
-		while (($item = readdir($dh)) !== false) {//Go through everything in directory
+		while (($item = readdir($dh)) !== false) { //Go through everything in directory
 			if ($item == "." || $item == "..") { //Avoid going backward in directories
 				continue; 
 			}
@@ -52,7 +52,7 @@
 		@param results is the array ot store the results in
 	*/
 	function getDirContent($dir, $subDirectoriesToIgnore=array('.', '..'), 
-							&$results=array()) {
+							$filesToIgnore=array(), &$results=array()) {
 		if (!is_dir($dir)) { //is it a directory ?
 			throw new RepositoryScanException("$dir is not a directory");
 		}
@@ -62,12 +62,17 @@
 
 		$files = scandir($dir);
 
-		foreach($files as $item){
+		foreach ($files as $item) {
 			$path = realpath($dir.DIRECTORY_SEPARATOR.$item);
-			if(!is_dir($path)) {
-				array_push($results, $path);
-			} else if(!in_array($item, $subDirectoriesToIgnore)) {
-				getDirContent($path, $subDirectoriesToIgnore, $results);
+
+			if (!is_dir($path)) {
+				if (!in_array($item, $filesToIgnore)) {
+					array_push($results, $path);
+				}
+			} 
+			else if (!in_array($item, $subDirectoriesToIgnore)) {
+				getDirContent($path, $subDirectoriesToIgnore,
+								$filesToIgnore, $results);
 			}
 		}
 

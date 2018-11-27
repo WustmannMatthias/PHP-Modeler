@@ -2,11 +2,11 @@
 	
 	/*
 		§§ File scan
-		§§ Upload queries generation
+		§§ Query generation 
 	*/
 
 	require_once "functions/common_functions.php";
-	require_once "constants.inc";
+	require_once "parse_settings.php";
 	
 
 
@@ -153,8 +153,9 @@
 			@param line is a String
 		*/
 		private function analyseFeatures($line) {
-			if (startsWith($line, FEATURE_DEFINITION)) {
-				$feature = trim(str_replace(FEATURE_DEFINITION, '', $line));
+			global $featureSyntax;
+			if (startsWith($line, $featureSyntax)) {
+				$feature = trim(str_replace($featureSyntax, '', $line));
 				array_push($this->_features, $feature);
 			}
 		}

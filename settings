@@ -1,21 +1,22 @@
-##############################
-##### CONFIGURATION FILE #####
-##############################
+########################################
+########## CONFIGURATION FILE ##########
+########################################
 
 
 #Absolute path to the repository to analyse
-REPOSITORY = /home/wustmann/Documents/php/application_modeling_2.0
+#REPOSITORY = /home/wustmann/Documents/php/application_modeling_2.0
+#REPOSITORY = /home/wustmann/Documents/php/test_repo
+REPOSITORY = /home/wustmann/Documents/Pricer2016Q2
+#REPOSITORY = /home/wustmann/Documents/Pricer2016Q2/config
+#REPOSITORY = /home/wustmann/Documents/Pricer2016Q2/intranet
 
 
-#Information to connect to database
+#Information about the database
 DATABASE_URL = localhost
 DATABASE_PORT = 7687
 USERNAME = neo4j
 PASSWORD = "password"
 
-
-#Sub-directories to ignore, separated with commas
-SUB_DIRECTORIES = .git
 
 
 #Extensions of files to analyse, separated with commas
@@ -24,3 +25,19 @@ EXTENSIONS = php, inc, conf
 
 #Do you wish files without extensions to be model as well ?
 NO_EXTENSION_FILES = true
+
+
+#Syntax to use at the beginning of a line to precise a feature
+FEATURE_SYNTAX = §§
+
+
+#Sub-directories to ignore, separated with commas
+SUB_DIRECTORIES = .git
+
+
+#Files to ignore, separated with commas
+FILES = TODO, requirements, constraints
+
+
+
+

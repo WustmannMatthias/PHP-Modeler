@@ -1,4 +1,9 @@
 <?php
+	/*
+		§§ Run programm
+		§§ Modelise a repository
+	*/
+
 	/*******************************************************************************
 	********************************************************************************
 	******************************** INITIALISATION ********************************
@@ -26,12 +31,10 @@
 	require_once "exceptions/DependencyNotFoundException.php";
 	require_once "exceptions/WrongPathException.php";
 	
-	
 
 
 	//Get user settings
-	require "parse_settings.php";
-
+	require_once "parse_settings.php";
 
 
 
@@ -44,7 +47,7 @@
 	//Get array of every file in repo
 	$timestamp_directory = microtime(true);
 	try {
-		$files = getDirContent($repository, $subDirectoriesToIgnore);
+		$files = getDirContent($repository, $subDirectoriesToIgnore, $filesToIgnore);
 		$files = keepSpecificTypesOnly($files, $extensions, $noExtensionFiles);
 	}
 	catch (RepositoryScanException $e) {

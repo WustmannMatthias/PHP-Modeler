@@ -150,7 +150,7 @@ Il faut ajouter a la bdd tous les namespaces du vendor, mais ne pas ajouter les 
 	-> Pour les namespaces déclarés dans le vendor, ajouter un attribut inVendor valant True si le namespace est déclaré dans le vendor
 	-> On pourra ainsi décéler les relations USE vers des namespaces non déclarés en écrivant une requete du type 
 		Matcher les namespaces n'ayant aucune relations DECLARE pointant sur eux et n'ayant pas d'attribut inVendor
-
+	-> Il faut aussi faire attention de ne pas prendre en compte les dépendances include ou require vers des File qui ne sont pas encore dans la bdd : un MATCH vers un noeud inexistant pourri toute la requête.
 
 
 
@@ -175,7 +175,7 @@ ETAPE 7 : Commencer à préparer des requêtes qui sortiront des éléments int�
 
 
 
-AUTRES ETAPES : 
+AUTRE ETAPE : 
 	Le problème avec ce projet d'analyse statique de code est qu'en fonction des fichiers/repository testés, on rencontre de nouveaux cas particuliers à prendre en compte. 
 	Cette étape est donc réalisée au fur et à mesure que ces exceptions se rencontrent.
 	Par exemple : 
@@ -186,6 +186,14 @@ AUTRES ETAPES :
 		- ces variables peut être séparées par des opérateurs de concaténation, mais peuvent aussi être dans une chaine (ex: inlcude "machin/$var/machin") -> a prendre en compte également
 		- Les variables peuvent être des variables de php (ex: $_SERVER['kjdd']) -> impossible à prendre en ocmpte car je n'exécute pas le code, mais il faut indiquer quelque part que ce include n'est pas pris en compte dans la mdélisation.
 		- Les variables peuvent être des attributs d'un objet $objet->_attribut, auquel cas rechercher la déclaration devient plus compliquée.
+
+
+
+AUTRE ETAPE : 
+	Afin d'améliorer l'expérience utilisateur et de rendre le programme plus accessible, la création d'un fichier conf est souhaitable.
+	Le but est d'éviter de devoir préciser le nom du repository, les accès à la db, etc directement dans le code PHP.
+	J'ai donc créé un fichier settings, qui contient ces paramètres, et j'en ai profité pour en ajouter quelques un qui rendront le programme plus personnalisable, comme par exemple une liste de fichiers à de pas prendre en compte, une liste de sous répertoires à ne pas prendre en compte, les extensions à garder, si on prend ou non en compte les fichiers sans extensions, la syntaxe à utiliser pour la définition des features, etc.
+	Le fichier constants.inc est devenu obselète.
 
 
 
