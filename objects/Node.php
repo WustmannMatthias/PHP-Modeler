@@ -5,8 +5,10 @@
 		§§ Query generation 
 	*/
 
+	require_once "Dependency.php";
 	require_once "functions/common_functions.php";
 	require_once "parse_settings.php";
+	require_once "exceptions/WrongDependencyTypeException.php";
 	
 
 
@@ -27,8 +29,7 @@
 		
 		private $_features;
 
-		private $_includes;
-		private $_requires;
+		private $_fileInclusions;
 		private $_namespaces;
 		private $_globalVariables;
 		private $_uses;
@@ -52,8 +53,7 @@
 			
 			$this->_features		= array();
 			
-			$this->_includes 		= array();
-			$this->_requires 		= array();
+			$this->_fileInclusions	= array();
 			$this->_namespaces 		= array();
 			$this->_uses 			= array();
 		}
@@ -106,7 +106,7 @@
 				throw new FileNotFoundException($this->_path);
 			}
 
-			$inComment = false;
+			$inComment = FALSE;
 			$lineCount = 0;
 
 			$fileHandler = fopen($this->_path, 'r');
@@ -122,16 +122,17 @@
 					
 					// Comments handling
 					if (startsWith($line, "//")) continue;
-					if (startsWith($line, "/*")) $inComment = true;
+					if (startsWith($line, "/*")) $inComment = TRUE;
 					if ($inComment) {
-						if (strpos($line, "*/") === false) continue;
-						else $inComment = false;
+						if (strpos($line, "*/") === FALSE) continue;
+						else $inComment = FALSE;
 					}
 
 					$this->analyseNameSpaces($line);
 					$this->analyseUses($line);
-					$this->analyseIncludes($line, $lineCount);
-					$this->analyseRequires($line, $lineCount);
+					//$this->analyseIncludes($line, $lineCount);
+					//$this->analyseRequires($line, $lineCount);
+					$this->analyseFileInclusions($line, $lineCount);
 				}
 			}
 		}
@@ -160,17 +161,20 @@
 			}
 		}
 
+
+
 		/**
-			Matches include statements and extract argument.
+			Matches include/require statements and extract argument.
 			If the argument is composed of variables, they will be replaced by their
-			values. However, if the variable is defined in an other file, the value won't be
-			found.
+			values. However, if the variable is defined in an other file, the value won't be found.
 			@param line is the line to analyse (String)
 			@param lineCount is the number of the line (int)
 		*/
-		private function analyseIncludes($line, $lineCount) {
-			$regex = "/include(_once)?\s+[-_ A-Za-z0-9\$\.\"']+/";
-			if (preg_match($regex, $line)) { 
+		private function analyseFileInclusions($line, $lineCount) { 
+			$matches = array();
+			$regex = "/((require)|(include)){1}(_once)?\s+[-_ A-Za-z0-9\$\.\"']+/";
+
+			if (preg_match($regex, $line, $matches)) { 
 				if ($this->isVariableInLine($line)) {
 					$line = $this->replaceVariables($line, $lineCount);
 				}
@@ -185,32 +189,31 @@
 				$path = $this->fillPath($line, $lineCount);
 
 				if (!Node::isInVendor($path, $this->_repoName)) {
-					array_push($this->_includes, $path);
-				}
-			}
-		}
+					if (strpos($matches[0], 'include_once') !== FALSE) {
+						$type = 'include';
+						$once = TRUE;
+					}
+					else if (strpos($matches[0], 'require_once') !== FALSE) {
+						$type = 'require';
+						$once = TRUE;
+					}
+					else if (strpos($matches[0], 'include') !== FALSE) {
+						$type = 'include';
+						$once = FALSE;
+					}
+					else if (strpos($matches[0], 'require') !== FALSE) {
+						$type = 'require';
+						$once = FALSE;
+					}
+					else {
+						throw new WrongDependencyTypeException($this->_path, 
+									$line, $matches[0]);
+					}
 
-		/**
-			Like analyseIncludes($line, $lineCount), but for require statements
-		*/
-		private function analyseRequires($line, $lineCount) {
-			$regex = "/require(_once)?\s+[-_ A-Za-z0-9\$\.\"']+/";
-			if (preg_match($regex, $line)) { 
-				if ($this->isVariableInLine($line)) {
-					$line = $this->replaceVariables($line, $lineCount);
-				}
-				if ($this->isMagicConstantInLine($line)) {
-					$line = $this->replaceMagicConstant($line);
-				}
-				if ($subLine = $this->isShittyConstantInLine($line)) {
-					$line = $this->replaceShittyConstant($line, $subLine);
-				}
-				$line = $this->removeUnnecessary($line);
-				$line = $this->removeDoubleSlash($line);
-				$path = $this->fillPath($line, $lineCount);
+					$dependency = new Dependency($path, $type, $once, 
+												$this->_path, $lineCount);
 
-				if (!Node::isInVendor($path, $this->_repoName)) {
-					array_push($this->_requires, $path);
+					array_push($this->_fileInclusions, $dependency);
 				}
 			}
 		}
@@ -249,10 +252,10 @@
 			@return is a boolean
 		*/
 		private function isVariableInLine($line) {
-			if (strpos($line, '$') === false) { //=== because '$' can be at index 0
-				return false;
+			if (strpos($line, '$') === FALSE) { //=== because '$' can be at index 0
+				return FALSE;
 			}
-			return true;
+			return TRUE;
 		}
 
 		/**
@@ -261,10 +264,10 @@
 			@return is a boolean
 		*/
 		private function isMagicConstantInLine($line) {
-			if (strpos($line, '__DIR__') === false) { //=== because '$' can be at index 0
-				return false;
+			if (strpos($line, '__DIR__') === FALSE) { //=== because '$' can be at index 0
+				return FALSE;
 			}
-			return true;
+			return TRUE;
 		}
 
 
@@ -280,7 +283,7 @@
 			if (preg_match($regex, $line, $result)) {
 				return $result;
 			}
-			return false;
+			return FALSE;
 		}
 		
 
@@ -307,15 +310,15 @@
 			$output = array();
 			$endVariableChar = array('.', ';', ' ', ')');
 			$tab = str_split($line);
-			$inVariable = false;
+			$inVariable = FALSE;
 			$variableName = "";
 			foreach ($tab as $index => $character) {
 				if ($character === "$") {
-					$inVariable = true;
+					$inVariable = TRUE;
 				}
 				if ($inVariable && in_array($character, $endVariableChar)) {
 					array_push($output, $variableName);
-					$inVariable = false;
+					$inVariable = FALSE;
 					$variableName = "";
 				}
 				if ($inVariable) {
@@ -427,8 +430,8 @@
 		private function removeUnnecessary($line) {
 			//echo $line."<br>";
 			$tab = str_split(trim($line));
-			$inSimpleQuotes = false;
-			$inDoubleQuotes = false;
+			$inSimpleQuotes = FALSE;
+			$inDoubleQuotes = FALSE;
 			$output = "";
 			foreach ($tab as $character) {
 				if ($character == "'") {
@@ -476,8 +479,8 @@
 		private function extractUses($line) {
 			$line = substr($line, 0, strlen($line) - 1);
 			$argument = trim(str_replace("use ", "", $line));
-			if (strpos($argument, '\\') === false) {
-				return false;
+			if (strpos($argument, '\\') === FALSE) {
+				return FALSE;
 			}
 			return $argument;
 		}
@@ -526,7 +529,7 @@
 
 
 			if (!file_exists($path)) {
-				throw new DependencyNotFoundException($this->_path, $path, $lineCount, false);
+				throw new DependencyNotFoundException($this->_path, $path, $lineCount, FALSE);
 			}
 			
 
@@ -565,9 +568,9 @@
 		*/
 		private function isAbsolutePath($path) {
 			if (startsWith($path, '/')) {
-				return true;
+				return TRUE;
 			}
-			return false;
+			return FALSE;
 		}
 
 
@@ -623,10 +626,10 @@
 			@return is a either a bool or a String
 		*/
 		public function generateUploadQuery() {
-			//In this case, query would be null -> return false to avoid useless
+			//In this case, query would be null -> return FALSE to avoid useless
 			//operations
 			if ($this->_inVendor && sizeof($this->_namespaces) == 0) {
-				return false;
+				return FALSE;
 			}
 
 			//Create Node
@@ -661,7 +664,7 @@
 				$query.= "MERGE (ns".$counter.":Namespace {name: '$namespace'";
 				
 				if ($this->_inVendor) {
-					$query.= ", inVendor: True";
+					$query.= ", inVendor: TRUE";
 				}
 				$query.= "}) ";
 
@@ -678,66 +681,41 @@
 
 
 		/**
-			Generates a Cypher Query that creates every relation between this nodes and the
-			nodes included in it.
+			Generates a Cypher Query that creates every relation between this nodes and the nodes included or required in it.
 			@return is a mixed value : 
-				- if there aren't any nodes included, returns false
+				- if there aren't any nodes included, returns FALSE
 				- if there are, return is a String : the Cypher query
 		*/
-		public function generateIncludeRelationQuery() {
-			if (sizeof($this->_includes) == 0) {
-				return false;
+		public function generateFileInclusionsRelationQuery() {
+			if (sizeof($this->_fileInclusions) == 0) {
+				return FALSE;
 			}
+
 			$includeRelation = "IS_INCLUDED_BY";
-			$path 		= Node::getPathFromRepo($this->_path, $this->_repoName);
-			$queryBegin = "MATCH (ni:File {path: '".$path."'}) " ;
-			$queryEnd	= "";
-
-			$iCounter = 0;
-			foreach ($this->_includes as $include) {
-				$includePath = Node::getPathFromRepo($include, $this->_repoName);
-				$iCounter ++;
-				$queryBegin .= "MATCH (ni".$iCounter.":File {path: '$includePath'}) ";
-				$queryEnd 	.= "CREATE (ni".$iCounter.")-[ri".$iCounter.":"
-							.$includeRelation."]->(ni) ";
-			}
-
-			$query = $queryBegin.$queryEnd;
-			return $query;
-		}
-
-
-		/**
-			Generates a Cypher Query that creates every relation between this nodes and the
-			nodes required in it.
-			@return is a mixed value : 
-				- if there aren't any nodes required, returns false
-				- if there are, return is a String : the Cypher query
-		*/
-		public function generateRequireRelationQuery() {
-			if (sizeof($this->_requires) == 0) {
-				return false;
-			}
-
 			$requireRelation = "IS_REQUIRED_BY";
 
 			$path 		= Node::getPathFromRepo($this->_path, $this->_repoName);
-			$queryBegin = "MATCH (nr:File {path: '".$path."'}) " ;
+			$queryBegin = "MATCH (n:File {path: '".$path."'}) " ;
 			$queryEnd	= "";
 
-			$rCounter = 0;
-			foreach ($this->_requires as $require) {
-				$requirePath = Node::getPathFromRepo($require, $this->_repoName);
-				$rCounter ++;
-				$queryBegin .= "MATCH (nr".$rCounter.":File {path: '$requirePath'}) ";
-				$queryEnd 	.= "CREATE (nr".$rCounter.")-[rr".$rCounter.":"
-							.$requireRelation."]->(nr) ";
+			$counter = 0;
+			foreach ($this->_fileInclusions as $includedFile) {
+				$includedFilePath = Node::getPathFromRepo($includedFile->getPath(), 
+									$this->_repoName);
+				$relation = $includedFile->getRelation();
+				$once = $includedFile->getOnce(); 
+
+				$counter ++;
+
+				$queryBegin .= "MATCH (n".$counter.":File {path: '$includedFilePath'}) ";
+
+				$queryEnd 	.= "CREATE (n".$counter.")-[r".$counter.":"
+							.$relation." {once: '".$once."'}]->(n) ";
 			}
 
 			$query = $queryBegin.$queryEnd;
 			return $query;
 		}
-
 
 
 
@@ -745,12 +723,12 @@
 			Generates a Cypher Query that creates every relation between this nodes and 
 			the other namespaces it uses elements from.
 			@return is a mixed value : 
-				- if there aren't any use statement in this file, returns false
+				- if there aren't any use statement in this file, returns FALSE
 				- if there are, return is a String : the Cypher query
 		*/
 		public function generateUseRelationQuery() {
 			if (sizeof($this->_uses) == 0) {
-				return false;
+				return FALSE;
 			}
 
 			$uses = $this->prepareUses();
@@ -842,7 +820,7 @@
 			@return is a String
 		*/
 		public static function getPathFromRepo($fullPath, $repoName) {
-			if (strpos($fullPath, $repoName) === false) {
+			if (strpos($fullPath, $repoName) === FALSE) {
 				throw new WrongPathException($fullPath, $repoName);
 			}
 			//echo "Full path : $fullPath<br>";

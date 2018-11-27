@@ -11,7 +11,7 @@
 	*******************************************************************************/
 
 	error_reporting(E_ALL);
-	$timestamp_full = microtime(true);
+	$timestamp_full = microtime(TRUE);
 
 	require_once "vendor/autoload.php";
 	
@@ -45,7 +45,7 @@
 	*******************************************************************************/
 	
 	//Get array of every file in repo
-	$timestamp_directory = microtime(true);
+	$timestamp_directory = microtime(TRUE);
 	try {
 		$files = getDirContent($repository, $subDirectoriesToIgnore, $filesToIgnore);
 		$files = keepSpecificTypesOnly($files, $extensions, $noExtensionFiles);
@@ -58,7 +58,7 @@
 	}
 	
 	$repoName = getRepoName($repository);
-	$timestamp_directory = microtime(true) - $timestamp_directory;
+	$timestamp_directory = microtime(TRUE) - $timestamp_directory;
 	
 
 
@@ -90,7 +90,7 @@
 		in the modeling. However, links between files won't be.
 	*/
 	echo "<h2>STEP 1 ANALYSE</h2>";
-	$timestamp_analyse = microtime(true);
+	$timestamp_analyse = microtime(TRUE);
 	$nodes = array();
 	foreach ($files as $file) {
 		//Create Node object for each file and analyse it
@@ -121,6 +121,9 @@
 			catch (WrongPathException $e) {
 				printAnalysisExceptionMessage($e, $node->getPath());
 			}
+			catch (WrongDependencyTypeException $e) {
+				printAnalysisExceptionMessage($e, $node->getPath());
+			}
 			
 			//Send node in database
 			$uploadQuery = $node->generateUploadQuery();
@@ -138,7 +141,7 @@
 
 	}
 	echo "<br>Done.<br><br><br><br><br>";
-	$timestamp_analyse = microtime(true) - $timestamp_analyse;
+	$timestamp_analyse = microtime(TRUE) - $timestamp_analyse;
 
 
 
@@ -155,19 +158,13 @@
 		STEP 2 : Read informations stored in every node, send relations in database.
 	*/
 	echo "<h2>STEP 2 UPLOAD DEPENDENCIES</h2>";
-	$timestamp_dependencies = microtime(true);
+	$timestamp_dependencies = microtime(TRUE);
 	foreach ($nodes as $node) {
 		try {
-			//Send include relations in database
-			$includeQuery = $node->generateIncludeRelationQuery();
-			if ($includeQuery) {
-				runQuery($client, $includeQuery);
-			}
-
-			//Send require relations in database
-			$requireQuery = $node->generateRequireRelationQuery();
-			if ($requireQuery) {
-				runQuery($client, $requireQuery);
+			//Send include/require relations in database
+			$fileInclusionsQuery = $node->generateFileInclusionsRelationQuery();
+			if ($fileInclusionsQuery) {
+				runQuery($client, $fileInclusionsQuery);
 			}
 
 			//Send use relations in database
@@ -181,7 +178,7 @@
 		}
 	}
 	echo "<br>Done.<br><br><br><br><br>";
-	$timestamp_dependencies = microtime(true) - $timestamp_dependencies;
+	$timestamp_dependencies = microtime(TRUE) - $timestamp_dependencies;
 
 
 
@@ -192,7 +189,7 @@
 	*************************** DISPLAY * PERFORMANCES *****************************
 	********************************************************************************
 	*******************************************************************************/
-	$timestamp_full = microtime(true) - $timestamp_full;
+	$timestamp_full = microtime(TRUE) - $timestamp_full;
 
 	echo "<h2>PERFORMANCES</h2>";
 	echo "Time to load repository : ".number_format($timestamp_directory, 4)."s<br>";
