@@ -1,5 +1,7 @@
 <?php 
-
+	/**
+		§§ Generate exception messages
+	*/
 	class DependencyNotFoundException extends Exception {
 		
 		public function __construct($file, $dependency, $line) {

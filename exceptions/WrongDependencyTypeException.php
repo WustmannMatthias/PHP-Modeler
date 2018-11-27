@@ -1,5 +1,7 @@
 <?php 
-
+	/**
+		§§ Generate exception messages
+	*/
 	class WrongDependencyTypeException extends Exception {
 		
 		public function __construct($nodePath, $line, $type) {

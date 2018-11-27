@@ -1,5 +1,7 @@
 <?php
-	
+	/**
+		§§ Generate exception messages
+	*/
 	class UnunderstoodVariableDeclarationException extends Exception {
 
 		public function __construct($file, $line) {

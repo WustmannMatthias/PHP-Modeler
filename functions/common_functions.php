@@ -1,4 +1,7 @@
 <?php
+	/**
+		§§ Useful general functions
+	*/
 
 	/**
 		Display an given array

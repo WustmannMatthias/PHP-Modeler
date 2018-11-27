@@ -1,5 +1,7 @@
 <?php 
-
+	/**
+		§§ Generate exception messages
+	*/
 	class WrongPathException extends Exception {
 		
 		public function __construct($fullPath, $repoName) {

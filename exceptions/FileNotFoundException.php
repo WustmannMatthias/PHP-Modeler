@@ -1,5 +1,7 @@
 <?php
-	
+	/**
+		§§ Generate exception messages
+	*/
 	class FileNotFoundException extends Exception {
 
 		public function __construct($file) {

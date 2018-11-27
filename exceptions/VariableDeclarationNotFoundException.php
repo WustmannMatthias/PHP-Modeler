@@ -1,5 +1,7 @@
 <?php
-
+	/**
+		§§ Generate exception messages
+	*/
 	class VariableDeclarationNotFoundException extends Exception {
 
 		public function __construct($file, $variables) {

@@ -26,7 +26,8 @@
 		private $_lastModified;
 		private $_repoName;
 		private $_inVendor;
-		
+		private $_loc;
+
 		private $_features;
 
 		private $_fileInclusions;
@@ -135,6 +136,8 @@
 					$this->analyseFileInclusions($line, $lineCount);
 				}
 			}
+
+			$this->_loc = $lineCount;
 		}
 
 
@@ -642,6 +645,7 @@
 									."', path: '".Node::getPathFromRepo($this->_path, 
 										$this->_repoName)
 									."', size: '".$this->_size
+									."', loc: '".$this->_loc
 									."', lastModified: '".$this->_lastModified
 									."', extension: '".$this->_extension
 									."'}) ";

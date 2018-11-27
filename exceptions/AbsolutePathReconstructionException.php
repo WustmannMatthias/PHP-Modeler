@@ -1,4 +1,7 @@
 <?php 
+	/**
+		§§ Generate exception messages
+	*/
 
 	class AbsolutePathReconstructionException extends Exception {
 		
