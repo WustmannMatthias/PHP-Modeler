@@ -90,6 +90,9 @@
 		in the modeling. However, links between files won't be.
 	*/
 	echo "<h2>STEP 1 ANALYSE</h2>";
+	echo "Files to analyse : ".sizeof($files);
+	echo "<br><br><br><br>";
+
 	$timestamp_analyse = microtime(TRUE);
 	$nodes = array();
 	foreach ($files as $file) {

@@ -15,12 +15,10 @@
 	    ->addConnection('bolt', 'bolt://neo4j:password@localhost:7687')
 	    ->build();
 	
-	$query = "MATCH (n:File) WHERE NOT (n)-[:IS_INCLUDED_IN]->() 
-							   AND NOT (n)-[:IS_REQUIRED_IN]->()
-							   AND NOT (n)-[:IS_USED_BY]	->()
-							   AND NOT (n)-[:DECLARES]		->(:Namespace)
-							   		-[:IS_USED_BY]->(:File)
-			  RETURN n.path as path";
+	$query = "MATCH (f:File)	WHERE NOT (f)-[:IS_INCLUDED_IN]->() 
+							   	AND NOT (f)-[:IS_REQUIRED_IN]->()
+							   	AND NOT (f)-[:DECLARES]->(:Namespace) 
+			  RETURN f.path as path";
 
 	
 	$result = runQuery($client, $query);
