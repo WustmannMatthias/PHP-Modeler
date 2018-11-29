@@ -1,0 +1,47 @@
+Find all non non declared Namespaces : 
+
+MATCH (n:Namespace)
+WHERE NOT EXISTS (n.inVendor)
+AND NOT EXISTS ( (n)<-[:DECLARES]-(:File) )
+RETURN n.name as namespace
+
+
+
+Find all files that use some non-declared namespaces : 
+
+MATCH (n:Namespace)
+WHERE NOT EXISTS (n.inVendor)
+AND NOT EXISTS ( (n)<-[:DECLARES]-(:File) )
+MATCH (f:File)<-[use:IS_USED_BY]-(n)
+RETURN f.path as file, n.name as namespace, use.class as classes
+
+
+
+
+
+
+
+Find how many lines of code are loaded by a file (including this file) :
+
+MATCH (n:File {name: "Node.php"})<-[:IS_REQUIRED_IN|:IS_INCLUDED_IN*0..]-(f:File) RETURN sum(f.loc)
+
+
+Find how many lines of code are loaded by a file (excluding this file) :
+
+MATCH (n:File {name: "Node.php"})<-[:IS_REQUIRED_IN|:IS_INCLUDED_IN*1..]-(f:File) RETURN sum(f.loc)
+
+
+
+
+
+
+Find all features affected by a file :
+
+MATCH p = (file:File {path: "$path"})-[:IS_INCLUDED_IN|:IS_REQUIRED_IN|:IS_USED_BY|:IMPACTS|:DECLARES*0..]->(feature:Feature) RETURN DISTINCT feature.name AS feature
+
+
+
+Find files affecting a feature : 
+
+MATCH (file:File)-[:IS_INCLUDED_IN|:IS_REQUIRED_IN|:IS_USED_BY|:IMPACTS|:DECLARES*0..]->(feature:Feature {name:"$feature" }) RETURN DISTINCT file.path AS file
+

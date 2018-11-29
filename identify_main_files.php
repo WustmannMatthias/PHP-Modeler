@@ -1,5 +1,6 @@
 <?php
-	
+
+
 	require_once "functions/database_functions.php";
 	require_once 'vendor/autoload.php';
 
@@ -16,7 +17,11 @@
 	
 	$query = "MATCH (n:File) WHERE NOT (n)-[:IS_INCLUDED_IN]->() 
 							   AND NOT (n)-[:IS_REQUIRED_IN]->()
+							   AND NOT (n)-[:IS_USED_BY]	->()
+							   AND NOT (n)-[:DECLARES]		->(:Namespace)
+							   		-[:IS_USED_BY]->(:File)
 			  RETURN n.path as path";
+
 	
 	$result = runQuery($client, $query);
 

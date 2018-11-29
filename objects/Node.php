@@ -91,8 +91,7 @@
 
 		/**
 			Main method of the class
-			This method run one time through every line of the file, analyse it, and store
-			following registred informations in attributes of the instance : 
+			This method run one time through every line of the file, analyse it, and store following registred informations in attributes of the instance : 
 			- file included/required in this one
 			- outside classes used
 			- declared namespaces
@@ -131,8 +130,6 @@
 
 					$this->analyseNameSpaces($line);
 					$this->analyseUses($line);
-					//$this->analyseIncludes($line, $lineCount);
-					//$this->analyseRequires($line, $lineCount);
 					$this->analyseFileInclusions($line, $lineCount);
 				}
 			}
@@ -175,7 +172,7 @@
 		*/
 		private function analyseFileInclusions($line, $lineCount) { 
 			$matches = array();
-			$regex = "/((require)|(include)){1}(_once)?\s+[-_ A-Za-z0-9\$\.\"']+/";
+			$regex = "/((require)|(include)){1}(_once)?\s+([-_ A-Za-z0-9\$\.\"'\/]){3,500}/";
 
 			if (preg_match($regex, $line, $matches)) { 
 				if ($this->isVariableInLine($line)) {
@@ -215,7 +212,7 @@
 
 					$dependency = new Dependency($path, $type, $once, 
 												$this->_path, $lineCount);
-
+					
 					array_push($this->_fileInclusions, $dependency);
 				}
 			}
@@ -512,8 +509,7 @@
 			@param $newPath is a String
 		*/
 		private function fillPath($path, $lineCount) {
-			if (!$this->isAbsolutePath($path)) { // No need to concatenate for absolute paths
-				//echo $path."<br>";
+			if (!$this->isAbsolutePath($path)) { 
 				$dirname = dirname($this->_path);
 				//echo $dirname."<br>";
 				$counter = 0;
@@ -644,9 +640,9 @@
 				$query.= "CREATE (n:File {name: '".$this->_name
 									."', path: '".Node::getPathFromRepo($this->_path, 
 										$this->_repoName)
-									."', size: '".$this->_size
-									."', loc: '".$this->_loc
-									."', lastModified: '".$this->_lastModified
+									."', size: ".intval($this->_size)
+									." , loc: ".intval($this->_loc)
+									." , lastModified: '".$this->_lastModified
 									."', extension: '".$this->_extension
 									."'}) ";
 			}
@@ -668,7 +664,7 @@
 				$query.= "MERGE (ns".$counter.":Namespace {name: '$namespace'";
 				
 				if ($this->_inVendor) {
-					$query.= ", inVendor: TRUE";
+					$query.= ", inVendor: ".boolval(TRUE);
 				}
 				$query.= "}) ";
 
@@ -714,7 +710,7 @@
 				$queryBegin .= "MATCH (n".$counter.":File {path: '$includedFilePath'}) ";
 
 				$queryEnd 	.= "CREATE (n".$counter.")-[r".$counter.":"
-							.$relation." {once: '".$once."'}]->(n) ";
+							.$relation." {once: '".boolval($once)."'}]->(n) ";
 			}
 
 			$query = $queryBegin.$queryEnd;
