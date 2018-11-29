@@ -172,7 +172,7 @@
 		*/
 		private function analyseFileInclusions($line, $lineCount) { 
 			$matches = array();
-			$regex = "/((require)|(include)){1}(_once)?\s+([-_ A-Za-z0-9\$\.\"'\/]){3,500}/";
+			$regex = "/((require)|(include)){1}(_once)?\s+[-_ A-Za-z0-9\$\.\"'\/\s\[\]]+;/";
 
 			if (preg_match($regex, $line, $matches)) { 
 				if ($this->isVariableInLine($line)) {

@@ -28,7 +28,7 @@ EXTENSIONS = php, inc, conf
 
 
 #Do you wish files without extensions to be model as well ?
-NO_EXTENSION_FILES = true
+NO_EXTENSION_FILES = false
 
 
 #Syntax to use at the beginning of a line to precise a feature
