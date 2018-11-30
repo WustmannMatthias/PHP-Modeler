@@ -347,7 +347,7 @@
 				foreach ($variableNames as $variableName) {
 					if (startsWith(trim($line), $variableName)) {
 						$declarationLines[$variableName] = $line;
-						//echo "found<br>";
+						//echo "found\n";
 					}
 				}
 				if (sizeof($variableNames) == sizeof($declarationLines)) {
@@ -404,7 +404,7 @@
 			$dirPath = str_replace($this->_name, "", $this->_path);
 			$newLine = str_replace("__DIR__", '"'.$dirPath.'"', $line);
 			
-			//echo "<br>".$newline."<br>";
+			//echo "\n".$newline."\n";
 			return $newLine;
 		}
 
@@ -428,7 +428,7 @@
 			@return (string) is the new line
 		*/
 		private function removeUnnecessary($line) {
-			//echo $line."<br>";
+			//echo $line."\n";
 			$tab = str_split(trim($line));
 			$inSimpleQuotes = FALSE;
 			$inDoubleQuotes = FALSE;
@@ -444,7 +444,7 @@
 					$output.= $character;
 				}
 			}
-			//echo $output."<br>";
+			//echo $output."\n";
 			return $output;
 		}
 
@@ -456,7 +456,7 @@
 		*/
 		private function removeDoubleSlash($line) {
 			$line = str_replace('//', '/', $line);
-			//echo $line."<br>";
+			//echo $line."\n";
 			return $line;
 		}
 
@@ -511,10 +511,10 @@
 		private function fillPath($path, $lineCount) {
 			if (!$this->isAbsolutePath($path)) { 
 				$dirname = dirname($this->_path);
-				//echo $dirname."<br>";
+				//echo $dirname."\n";
 				$counter = 0;
 				while (!file_exists($dirname.'/'.$path)) {
-					//echo $dirname.'/'.$path."<br>";
+					//echo $dirname.'/'.$path."\n";
 					$dirname = $this->removeLastDirectoryInPath($dirname);
 					$counter ++;
 					if ($counter > 20) { //Security, to avoid infinite loop
@@ -523,7 +523,7 @@
 					}
 				}
 				$path = $dirname.'/'.$path;
-				//echo $path."<br>";
+				//echo $path."\n";
 			}
 
 
@@ -554,7 +554,7 @@
 				throw new DependencyNotFoundException($this->_path, $path, $lineCount);
 			}
 			//echo "NewPath : ".$newPath;
-			//echo "<br><br>";
+			//echo "\n\n";
 			return $newPath;
 		}
 
@@ -673,7 +673,7 @@
 				}
 			}
 
-			//echo $query."<br>";
+			//echo $query."\n";
 			return $query;
 		}
 
@@ -823,8 +823,8 @@
 			if (strpos($fullPath, $repoName) === FALSE) {
 				throw new WrongPathException($fullPath, $repoName);
 			}
-			//echo "Full path : $fullPath<br>";
-			//echo "Repo Name : $repoName<br>";
+			//echo "Full path : $fullPath\n";
+			//echo "Repo Name : $repoName\n";
 			return $repoName.'/'.explode('/'.$repoName.'/', $fullPath)[1];
 		}
 
@@ -885,11 +885,11 @@
 		*/
 		public function __toString() {
 			return "name 			=> ".$this->_name
-			  ."<br>path 			=> ".$this->_path
-			  ."<br>size 			=> ".$this->_size
-			  ."<br>lastModified 	=> ".$this->_lastModified
-			  ."<br>extension 		=> ".$this->_extension
-			  ."<br><br>";
+			  ."\npath 			=> ".$this->_path
+			  ."\nsize 			=> ".$this->_size
+			  ."\nlastModified 	=> ".$this->_lastModified
+			  ."\nextension 		=> ".$this->_extension
+			  ."\n\n";
 		}
 
 	}

@@ -9,9 +9,9 @@
 	*/
 	function displayArray($tab) {
 		foreach ($tab as $key => $value) {
-			echo "$key => $value <br>";
+			echo "$key => $value \n";
 		}
-		echo "<br>";
+		echo "\n";
 	}
 
 

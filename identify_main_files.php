@@ -26,18 +26,18 @@
 	echo "Here is the list of the main files of the programm. Thoses files aren't 
 			included or required in any others, and must be annotated to tell which
 			feature(s) they impact.";
-	echo "<br><br>";
+	echo "\n\n";
 
 	foreach ($result->records() as $record) {
 		echo $record->value("path");
-		echo "<br>";
+		echo "\n";
 	}
 
 
 
-	echo "<br>Done.<br>";
+	echo "\nDone.\n";
 
 
-	echo "<br><br>";
+	echo "\n\n";
 	echo 'Running time : ' .(microtime(true) - $timestamp_start). 's.';
 ?>

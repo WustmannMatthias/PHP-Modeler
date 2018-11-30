@@ -17,6 +17,6 @@ HOW TO USE :
 
 First of all, yo need to have an active and reachable neo4j database.
 
-In file settings, complete values of variable $repository with the absolute path to the repository you want to model, and complete values of databases variables to be enable the programm to connect to it.
+Complete the settings file as you want, and then just execute the index.php file.
 
-Then just execute the programm, and checkout your database !
+Then checkout your database !

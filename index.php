@@ -52,8 +52,8 @@
 	}
 	catch (RepositoryScanException $e) {
 		echo $e->getMessage();
-		echo "<br>";
-		echo "Can't scan repository. Program end.<br>";
+		echo "\n";
+		echo "Can't scan repository. Program end.\n";
 		exit();
 	}
 	
@@ -89,9 +89,9 @@
 		After this first step, every file, namespace, and feature will be represented
 		in the modeling. However, links between files won't be.
 	*/
-	echo "<h2>STEP 1 ANALYSE</h2>";
+	echo "<h2>STEP 1 ANALYSE</h2>\n";
 	echo "Files to analyse : ".sizeof($files);
-	echo "<br><br><br><br>";
+	echo "\n\n\n\n";
 
 	$timestamp_analyse = microtime(TRUE);
 	$nodes = array();
@@ -143,7 +143,7 @@
 		
 
 	}
-	echo "<br>Done.<br><br><br><br><br>";
+	echo "\nDone.\n\n\n\n\n";
 	$timestamp_analyse = microtime(TRUE) - $timestamp_analyse;
 
 
@@ -160,7 +160,7 @@
 	/**
 		STEP 2 : Read informations stored in every node, send relations in database.
 	*/
-	echo "<h2>STEP 2 UPLOAD DEPENDENCIES</h2>";
+	echo "<h2>STEP 2 UPLOAD DEPENDENCIES</h2>\n";
 	$timestamp_dependencies = microtime(TRUE);
 	foreach ($nodes as $node) {
 		try {
@@ -180,7 +180,7 @@
 			printQueriesGenerationExceptionMessage($e, $node->getPath());
 		}
 	}
-	echo "<br>Done.<br><br><br><br><br>";
+	echo "\nDone.\n\n\n\n\n";
 	$timestamp_dependencies = microtime(TRUE) - $timestamp_dependencies;
 
 
@@ -194,13 +194,13 @@
 	*******************************************************************************/
 	$timestamp_full = microtime(TRUE) - $timestamp_full;
 
-	echo "<h2>PERFORMANCES</h2>";
-	echo "Time to load repository : ".number_format($timestamp_directory, 4)."s<br>";
+	echo "<h2>PERFORMANCES</h2>\n";
+	echo "Time to load repository : ".number_format($timestamp_directory, 4)."s\n";
 	echo "Time to analyse repository : " 
-		.number_format($timestamp_analyse, 4)."s<br>";
+		.number_format($timestamp_analyse, 4)."s\n";
 	echo "Time to upload dependencies : "
-		.number_format($timestamp_dependencies, 4)."s<br>";
-	echo "Script full running time : ".number_format($timestamp_full, 4)."s<br>";
-	echo "<br><br>";
+		.number_format($timestamp_dependencies, 4)."s\n";
+	echo "Script full running time : ".number_format($timestamp_full, 4)."s\n";
+	echo "\n\n";
 
 ?>

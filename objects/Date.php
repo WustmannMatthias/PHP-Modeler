@@ -35,10 +35,7 @@
 			$timestamp += $this->_second;
 			$timestamp += $this->_minute * 60;
 			$timestamp += $this->_hour * 60 * 60;
-			
-			echo $timestamp;
-			echo "<br>";
-			echo time();
+
 			return $timestamp;
 		}
 
