@@ -30,6 +30,8 @@
 	require_once "exceptions/AbsolutePathReconstructionException.php";
 	require_once "exceptions/DependencyNotFoundException.php";
 	require_once "exceptions/WrongPathException.php";
+	require_once "exceptions/UnunderstoodNamespaceDeclarationException.php";
+
 	
 
 
@@ -125,6 +127,9 @@
 				printAnalysisExceptionMessage($e, $node->getPath());
 			}
 			catch (WrongDependencyTypeException $e) {
+				printAnalysisExceptionMessage($e, $node->getPath());
+			}
+			catch (UnunderstoodNamespaceDeclarationException $e) {
 				printAnalysisExceptionMessage($e, $node->getPath());
 			}
 			

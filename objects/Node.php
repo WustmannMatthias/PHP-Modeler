@@ -8,7 +8,6 @@
 	require_once "Dependency.php";
 	require_once "functions/common_functions.php";
 	require_once "parse_settings.php";
-	require_once "exceptions/WrongDependencyTypeException.php";
 	
 
 
@@ -115,7 +114,7 @@
 				$lineCount ++;
 
 				if ($this->_inVendor) {
-					$this->analyseNameSpaces($line);
+					$this->analyseNameSpaces($line, $lineCount);
 				}
 				else {
 					$this->analyseFeatures($line);
@@ -128,7 +127,7 @@
 						else $inComment = FALSE;
 					}
 
-					$this->analyseNameSpaces($line);
+					$this->analyseNameSpaces($line, $lineCount);
 					$this->analyseUses($line);
 					$this->analyseFileInclusions($line, $lineCount);
 				}
@@ -222,10 +221,10 @@
 			Matches namespace statements and extract argument.
 			@param line is the line to analyse (String)
 		*/
-		private function analyseNameSpaces($line) {
+		private function analyseNameSpaces($line, $lineCount) {
 			$regex = "/^namespace\s+[-_ A-Za-z0-9\\\]+/";
 			if (preg_match($regex, $line)) {
-				$namespace = $this->extractNamespace($line);
+				$namespace = $this->extractNamespace($line, $lineCount);
 				array_push($this->_namespaces, $namespace);
 			}
 		}
@@ -235,7 +234,7 @@
 			@param line is the line to analyse (String)
 		*/
 		private function analyseUses($line) {
-			$regex = "/^use\s+[-_ A-Za-z0-9\\\]+/";
+			$regex = "/^use\s+[-_ A-Za-z0-9\\\]+;/";
 			if (preg_match($regex, $line)) {
 				$use = $this->extractUses($line);
 				if ($use) {
@@ -466,9 +465,23 @@
 			@param line is a String
 			@return is a String
 		*/
-		private function extractNamespace($line) {
-			$line = substr($line, 0, strlen($line) - 1);
-			return trim(str_replace("namespace ", "", $line));
+		private function extractNamespace($line, $lineCount) {
+			$end = strpos($line, ';');
+			if ($end === FALSE) {
+				$end = strpos($line, '{');
+			}
+			if ($end === FALSE) {
+				throw new UnunderstoodNamespaceDeclarationException($this->_path, 
+					$lineCount);
+			}
+
+			$line = substr($line, 0, $end);
+
+			$namespace = trim(str_replace("namespace ", "", $line));
+			if ($namespace[0] == '\\') {
+				$namespace = substr($namespace, 1);
+			}
+			return $namespace;
 		}
 
 		/**
@@ -477,11 +490,17 @@
 			@return is a String
 		*/
 		private function extractUses($line) {
-			$line = substr($line, 0, strlen($line) - 1);
+			$end = strpos($line, ';');
+			$line = substr($line, 0, $end);
+
 			$argument = trim(str_replace("use ", "", $line));
 			if (strpos($argument, '\\') === FALSE) {
 				return FALSE;
 			}
+			if ($argument[0] == '\\') {
+				$argument = substr($argument, 1);
+			}
+
 			return $argument;
 		}
 
