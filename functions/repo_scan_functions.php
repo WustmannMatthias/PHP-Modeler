@@ -1,5 +1,4 @@
 <?php
-	require_once "exceptions/RepositoryScanException.php";
 	
 	/**
 		Scans (recursively) a directory and returns all complete filenames within it in an array

@@ -141,7 +141,7 @@ Il a d'abord fallu apprendre les notions de namespace en php. Une classe, une va
 
 
 
-ETAPE 5 : Prendre partiellement en compte le vendor
+ETAPE 5 : Prendre partiellement en compte le vendor  (OK)
 
 Il faut ajouter a la bdd tous les namespaces du vendor, mais ne pas ajouter les neuds File, Feature, ni les relations entre les fichiers.
 	-> Création d'un attribut _inVendor dans la classe Node, qui correspondra a si le noeud est ou non dans un sous répertoire du dossier vendor
@@ -168,6 +168,7 @@ Il faudra d'abord lire attentivement la documentation afin de comprendre ce que 
 
 ETAPE 7 : Commencer à préparer des requêtes qui sortiront des éléments intéressants du graph : 
 	-> Les fichiers orphelins
+	-> Les namespaces orphelins
 	-> Les éléments en tête d'architecture
 	-> Les fichiers impactées par un fichier donné
 
@@ -186,6 +187,7 @@ AUTRE ETAPE :
 		- ces variables peut être séparées par des opérateurs de concaténation, mais peuvent aussi être dans une chaine (ex: inlcude "machin/$var/machin") -> a prendre en compte également
 		- Les variables peuvent être des variables de php (ex: $_SERVER['kjdd']) -> impossible à prendre en ocmpte car je n'exécute pas le code, mais il faut indiquer quelque part que ce include n'est pas pris en compte dans la mdélisation.
 		- Les variables peuvent être des attributs d'un objet $objet->_attribut, auquel cas rechercher la déclaration devient plus compliquée.
+	
 
 
 
@@ -197,7 +199,8 @@ AUTRE ETAPE :
 
 
 
-
+AUTRE ETAPE : 
+	Gérer les include/require avec un autoloader (dans le développement de mon application)
 
 
 
@@ -221,6 +224,11 @@ Créer un programme qui proposera des requêtes génériques :
 	- Sortir les fichiers modifiés entre telle et telle date
 	- Sortir tous les fichiers impactés par tel fichier 
 	- etc ???
+
+
+
+
+
 
 
 

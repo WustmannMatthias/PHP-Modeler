@@ -5,9 +5,7 @@
 		§§ Query generation 
 	*/
 
-	require_once "Dependency.php";
 	require_once "functions/common_functions.php";
-	require_once "parse_settings.php";
 	
 
 

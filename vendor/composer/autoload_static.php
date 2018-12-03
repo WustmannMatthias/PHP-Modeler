@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit9505221623200a13472a8f0e58fcae38
+class ComposerStaticInit5dbc40e67d18899c363c4764ed88d135
 {
     public static $files = array (
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
@@ -23,6 +23,10 @@ class ComposerStaticInit9505221623200a13472a8f0e58fcae38
         'P' => 
         array (
             'Psr\\Http\\Message\\' => 17,
+        ),
+        'N' => 
+        array (
+            'Nyholm\\Psr7\\' => 12,
         ),
         'M' => 
         array (
@@ -63,7 +67,12 @@ class ComposerStaticInit9505221623200a13472a8f0e58fcae38
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'Nyholm\\Psr7\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/nyholm/psr7/src',
         ),
         'MyCLabs\\Enum\\' => 
         array (
@@ -127,8 +136,8 @@ class ComposerStaticInit9505221623200a13472a8f0e58fcae38
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit9505221623200a13472a8f0e58fcae38::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit9505221623200a13472a8f0e58fcae38::$prefixDirsPsr4;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit5dbc40e67d18899c363c4764ed88d135::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit5dbc40e67d18899c363c4764ed88d135::$prefixDirsPsr4;
 
         }, null, ClassLoader::class);
     }

@@ -14,24 +14,15 @@
 	$timestamp_full = microtime(TRUE);
 
 	require_once "vendor/autoload.php";
+
+	require_once "autoloader.php";
 	
 	use GraphAware\Neo4j\Client\ClientBuilder;
-
-	require_once "objects/Node.php";
 
 	require_once "functions/common_functions.php";
 	require_once "functions/repo_scan_functions.php";
 	require_once "functions/database_functions.php";
 	require_once "functions/display_exceptions_functions.php";
-
-	require_once "exceptions/FileNotFoundException.php";
-	require_once "exceptions/VariableDeclarationNotFoundException.php";
-	require_once "exceptions/UnunderstoodVariableDeclarationException.php";
-	require_once "exceptions/AbsolutePathReconstructionException.php";
-	require_once "exceptions/DependencyNotFoundException.php";
-	require_once "exceptions/WrongPathException.php";
-	require_once "exceptions/UnunderstoodNamespaceDeclarationException.php";
-
 	
 
 
