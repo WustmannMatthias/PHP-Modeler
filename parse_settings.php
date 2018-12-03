@@ -23,6 +23,8 @@
 	if (endswith($repository, '/')) {
 		$repository = substr($repository, 0, strlen($repository) - 1);
 	}
+	$repoName = getRepoName($repository);
+
 
 	$databaseURL = $settings['DATABASE_URL'];
 	$databasePort = $settings['DATABASE_PORT'];
@@ -40,6 +42,8 @@
 	$subDirectoriesToIgnore = array_unique($subDirectoriesToIgnore);
 
 	$filesToIgnore = parseParameters($settings['FILES']);
+
+
 	
 	
 
