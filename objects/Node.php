@@ -232,7 +232,7 @@
 			@param line is the line to analyse (String)
 		*/
 		private function analyseUses($line) {
-			$regex = "/^use\s+[-_ A-Za-z0-9\\\]+;/";
+			$regex = "/^use\s+[-_ A-Za-z0-9\\\]+/";
 			if (preg_match($regex, $line)) {
 				$use = $this->extractUses($line);
 				if ($use) {
@@ -679,7 +679,8 @@
 			foreach ($this->doubleBackSlashes($this->_namespaces) as $namespace) {
 				$counter ++;
 				$query.= "MERGE (ns".$counter.":Namespace {name: '$namespace'";
-				
+				;
+
 				if ($this->_inVendor) {
 					$query.= ", inVendor: ".boolval(TRUE);
 				}

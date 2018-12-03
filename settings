@@ -7,12 +7,12 @@
 #REPOSITORY = /home/wustmann/Documents/php/application_modeling_2.0
 #REPOSITORY = /home/wustmann/Documents/php/test_repo
 #REPOSITORY = /home/wustmann/Documents/sfu-api
-#REPOSITORY = /home/wustmann/Documents/Pricer2016Q2
+REPOSITORY = /home/wustmann/Documents/Pricer2016Q2
 #REPOSITORY = /home/wustmann/Documents/Pricer2016Q2/config
 #REPOSITORY = /home/wustmann/Documents/Pricer2016Q2/intranet
 #REPOSITORY = /home/wustmann/Documents/invoicing
 #REPOSITORY = /home/wustmann/Documents/X_test_repo
-REPOSITORY = /home/wustmann/Documents/php/type_test_repo
+#REPOSITORY = /home/wustmann/Documents/php/type_test_repo
 
 
 

@@ -1,16 +1,10 @@
 <?php
 	function loadObject($className) {
-		if (strpos($className, '\\')) {
-			return;
-		}
-		require 'objects/'.$className.'.php';
+		@include 'objects/'.$className.'.php';
 	}
 
 	function loadException($className) {
-		if (strpos($className, '\\')) {
-			return;
-		}
-		require 'exceptions/'.$className.'.php';
+		@include 'exceptions/'.$className.'.php';
 	}
 
 

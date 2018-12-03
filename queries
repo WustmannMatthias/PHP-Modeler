@@ -18,6 +18,13 @@ RETURN f.path as file, n.name as namespace, use.class as classes
 
 
 
+Verify that all IS_USED_BY relations are valid (just for testing) : 
+
+MATCH p = ()-[r:IS_USED_BY]-()
+WHERE NOT EXISTS (r.class)
+RETURN p
+
+
 
 
 
