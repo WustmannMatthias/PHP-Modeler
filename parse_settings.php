@@ -1,9 +1,6 @@
 <?php
 	require_once 'functions/common_functions.php';
 
-
-	$settings = parse_ini_file("settings", true, INI_SCANNER_NORMAL);
-
 	/**
 		Just separate multiple parameters and returns an array with all trimed parameters
 		@param parameters is the String with parameters in it
@@ -19,11 +16,11 @@
 		return $output;
 	}
 
-	$repository = $settings['REPOSITORY'];
-	if (endswith($repository, '/')) {
-		$repository = substr($repository, 0, strlen($repository) - 1);
-	}
-	$repoName = getRepoName($repository);
+
+	/******************* PARSE SETTINGS FILE *********************/
+
+
+	$settings = parse_ini_file("settings", true, INI_SCANNER_NORMAL);
 
 
 	$databaseURL = $settings['DATABASE_URL'];
@@ -44,7 +41,26 @@
 	$filesToIgnore = parseParameters($settings['FILES']);
 
 
+
+
+	/******************* PARSE ITERATION FILE *********************/
+
+	try {
+		$iterationSettings = file_get_contents('iteration');
+	}
+	catch (Exception $e) {
+		echo "File iteration missing. Can't proceed.\n";
+		echo $e->getMessage();
+		exit();
+	}
+
+	$iterationSettings = explode("\n", $iterationSettings);
+
+	$repository = $iterationSettings[0];
+	$repoName = getRepoName($repository);
 	
+	$dateBegin = $iterationSettings[1];
+	$dateEnd = $iterationSettings[2];
 	
 
 	//displayArray($settings);

@@ -5,10 +5,11 @@
 
 directory='application_modeling'
 composer='composer.json'
+iterationFile='iteration'
 
 # Store software directory
 softwareDirectory=`pwd`
-
+iterationPath="$softwareDirectory/$iterationFile"
 
 
 
@@ -47,7 +48,7 @@ fi
 
 
 # Install dependencies
-if [ ! -d $composer ]
+if [ -f $composer ]
 then
 	echo "Installing dependencies..."
 	composer install > /dev/null 2>&1
@@ -55,6 +56,7 @@ then
 fi
 
 pathToRepo=`pwd`
+echo $pathToRepo > $iterationPath
 
 
 
@@ -64,17 +66,40 @@ read -p "Date AAAA-MM-DD : " -n 10 beginDate
 echo -e "\n"
 read -p "Hour HH:MM : " -n 5 beginHour
 echo -e "\n\n"
-echo -e "$date, $hour\n"
+echo -e "$beginDate, $beginHour" >> $iterationPath
 
 echo "############# END OF THE ITERATION #############"
 read -p "Date AAAA-MM-DD : " -n 10 endDate
 echo -e "\n"
 read -p "Hour HH:MM : " -n 5 endHour
 echo -e "\n\n"
-echo -e "$date, $hour\n"
+echo -e "$endDate, $endHour" >> $iterationPath
+
+
+# Ask for confirmation
+echo "################# CONFIRMATION #################"
+echo -e "Repository : $repo\n"
+echo -e "Begin of the iteration : $beginDate, $beginHour\n" 
+echo -e "Begin of the iteration : $endDate, $endHour\n"
+read -p "Proceed ? (Y/n)" -n 1 proceed
+if [ $proceed != 'y' ] && [ $proceed != 'Y' ]
+then 
+	echo -e "Script end. \n\n"
+	exit 1
+fi
+
+
+
+# Launch php Script
+cd $softwareDirectory
+
+echo -e "\n"
+echo -e "Starting...\n"
+php index.php
+
 
 
 
 
 echo -e "\n"
-echo "ok"
+echo "End bash Script"

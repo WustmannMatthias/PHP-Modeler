@@ -4,7 +4,7 @@
 
 
 #Absolute path to the repository to analyse
-REPOSITORY = /home/wustmann/Documents/php/application_modeling_2.0
+#REPOSITORY = /home/wustmann/Documents/php/application_modeling_2.0
 #REPOSITORY = /home/wustmann/Documents/php/test_repo
 #REPOSITORY = /home/wustmann/Documents/sfu-api
 #REPOSITORY = /home/wustmann/Documents/Pricer2016Q2
