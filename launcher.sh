@@ -31,7 +31,6 @@ read -p "URL of the repository to model : " url
 repo=${url##*/}
 repo=${repo%.git}
 
-echo -e "\n`pwd`\n"
 
 if [ ! -d $repo ]
 then
@@ -56,7 +55,7 @@ then
 fi
 
 pathToRepo=`pwd`
-echo $pathToRepo > $iterationPath
+echo "REPOSITORY = $pathToRepo" > $iterationPath
 
 
 
@@ -66,14 +65,14 @@ read -p "Date AAAA-MM-DD : " -n 10 beginDate
 echo -e "\n"
 read -p "Hour HH:MM : " -n 5 beginHour
 echo -e "\n\n"
-echo -e "$beginDate, $beginHour" >> $iterationPath
+echo -e "ITERATION_BEGIN = $beginDate, $beginHour" >> $iterationPath
 
 echo "############# END OF THE ITERATION #############"
 read -p "Date AAAA-MM-DD : " -n 10 endDate
 echo -e "\n"
 read -p "Hour HH:MM : " -n 5 endHour
 echo -e "\n\n"
-echo -e "$endDate, $endHour" >> $iterationPath
+echo -e "ITERATION_END = $endDate, $endHour" >> $iterationPath
 
 
 # Ask for confirmation

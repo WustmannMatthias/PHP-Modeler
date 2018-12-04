@@ -33,6 +33,10 @@
 		private $_uses;
 
 
+		private static $oldFileList;
+
+
+
 		/**
 			Get values of all attributes of the instance juste from the accesspath
 			@param path is a String -> absolute path to file
@@ -68,12 +72,20 @@
 			return @end(explode('/', $path));
 		}
 		private function pickUpLastModified($path) {
-			return date('d.m.Y H:i:s', filemtime($path));
+			return filemtime($path);
+			//return date('d.m.Y H:i:s', filemtime($path));
 		}
 		private function pickUpExtension($path) {
 			return @pathinfo($path)['extension'];
 		}
 
+
+		public static function setOldFileList($oldFileList) {
+			self::$oldFileList = $oldFileList;
+		}
+		public static function getOldFileList() {
+			return self::$oldFileList;
+		}
 
 
 
@@ -648,21 +660,44 @@
 				return FALSE;
 			}
 
+			$path = Node::getPathFromRepo($this->_path, $this->_repoName);
+
 			//Create Node
 			$featureRelation = "IMPACTS";
 			$namespaceRelation = "DECLARES";
 			$query = "";
 
 			if (!$this->_inVendor) {
-				$query.= "CREATE (n:File {name: '".$this->_name
-									."', path: '".Node::getPathFromRepo($this->_path, 
-										$this->_repoName)
+				// If Node didn't exist before, then create it
+				if (!array_key_exists($path, self::$oldFileList)) {
+					$query.= "CREATE (n:File {name: '".$this->_name
+									."', path: '".$path
 									."', size: ".intval($this->_size)
 									." , loc: ".intval($this->_loc)
-									." , lastModified: '".$this->_lastModified
-									."', extension: '".$this->_extension
+									." , last_modified: ".intval($this->_lastModified)
+									." , extension: '".$this->_extension
 									."'}) ";
+				}
+				else {
+					// If it did already exist but has now a more recent last_modified,
+					// update his stats
+					if ($this->_lastModified > self::$oldFileList[$path]) {
+						$query.= "MATCH (n:File {path: '$path'})
+								SET n.last_modified = ".intval($this->_lastModified)
+								.", n.size = ".intval($this->_size)
+								.", n.loc = ".intval($this->_loc)
+								." "; 
+
+					}
+					// If it is already it the graph and has not been modified since, 
+					// then don't do anything
+					else {
+						$query.= "MATCH (n:File {path: '$path'}) ";
+					}
+				}
 			}
+
+			
 
 			//Foreach of his features, create Node and relationship if not already exists
 			if (!$this->_inVendor) {
@@ -673,6 +708,8 @@
 					$query.= "CREATE (n)-[:".$featureRelation."]->(f".$counter.") ";
 				}
 			}
+
+			
 
 			//Foreach of his namespaces, create Node and relationship if not already exists
 			$counter = 0;
@@ -690,6 +727,9 @@
 					$query.= "CREATE (n)-[:".$namespaceRelation."]->(ns".$counter.") ";	
 				}
 			}
+
+			//Just in case there is nothing after a Match
+			$query.= " RETURN n";
 
 			//echo $query."\n";
 			return $query;

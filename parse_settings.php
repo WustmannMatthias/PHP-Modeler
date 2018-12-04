@@ -45,22 +45,13 @@
 
 	/******************* PARSE ITERATION FILE *********************/
 
-	try {
-		$iterationSettings = file_get_contents('iteration');
-	}
-	catch (Exception $e) {
-		echo "File iteration missing. Can't proceed.\n";
-		echo $e->getMessage();
-		exit();
-	}
+	$iterationSettings = parse_ini_file("iteration", true, INI_SCANNER_NORMAL);
 
-	$iterationSettings = explode("\n", $iterationSettings);
-
-	$repository = $iterationSettings[0];
+	$repository = $iterationSettings['REPOSITORY'];
 	$repoName = getRepoName($repository);
 	
-	$dateBegin = $iterationSettings[1];
-	$dateEnd = $iterationSettings[2];
+	$dateBegin = $iterationSettings['ITERATION_BEGIN'];
+	$dateEnd = $iterationSettings['ITERATION_END'];
 	
 
 	//displayArray($settings);

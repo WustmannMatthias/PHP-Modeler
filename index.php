@@ -64,12 +64,23 @@
 	$client = ClientBuilder::create()
 	    ->addConnection('bolt', $fullURL)
 	    ->build();
-	runQuery($client, "MATCH (n)-[r]->(n2) DELETE r, n, n2");
-	runQuery($client, "MATCH (n) DELETE n");
+	runQuery($client, "MATCH (n)-[r]->(n2) DELETE r");
+	runQuery($client, "MATCH (n:Namespace), (f:Feature) DELETE n, f");
 	
 
+	# Already get file list to win time later
+	$filesInDB = array();
+	$result = runQuery($client, "MATCH (n:File) RETURN n.path as path, 
+						n.last_modified as last_modified");
+	foreach ($result->records() as $record) {
+		$path = $record->value('path');
+		$last_modified = $record->value('last_modified');
+		$filesInDB[$path] = $last_modified;
+	}
 
-
+	include_once "objects/Node.php";
+	Node::setOldFileList($filesInDB);
+	///displayArray(Node::getOldFileList());
 
 
 	/*******************************************************************************
