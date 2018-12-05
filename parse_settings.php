@@ -1,4 +1,7 @@
 <?php
+	/**
+		§§ Parse Settings
+	*/
 	require_once 'functions/common_functions.php';
 
 	/**
@@ -49,10 +52,24 @@
 
 	$repository = $iterationSettings['REPOSITORY'];
 	$repoName = getRepoName($repository);
+	$iterationName 	= $iterationSettings['ITERATION_NAME'];
 	
-	$dateBegin = $iterationSettings['ITERATION_BEGIN'];
-	$dateEnd = $iterationSettings['ITERATION_END'];
+	$iterationBegin = Date::buildDateFromCalendar (	
+								$iterationSettings['ITERATION_BEGIN_YEAR'],
+								$iterationSettings['ITERATION_BEGIN_MONTH'],
+								$iterationSettings['ITERATION_BEGIN_DAY'],
+								$iterationSettings['ITERATION_BEGIN_HOUR'],
+								$iterationSettings['ITERATION_BEGIN_MINUTE']
+					);
 	
+	$iterationEnd 	= Date::buildDateFromCalendar (	 
+								$iterationSettings['ITERATION_END_YEAR'],
+							  	$iterationSettings['ITERATION_END_MONTH'],
+							  	$iterationSettings['ITERATION_END_DAY'],
+							  	$iterationSettings['ITERATION_END_HOUR'],
+							  	$iterationSettings['ITERATION_END_MINUTE']
+					);
+
 
 	//displayArray($settings);
 

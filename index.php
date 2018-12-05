@@ -25,9 +25,11 @@
 	require_once "functions/display_exceptions_functions.php";
 	
 
-
 	//Get user settings
 	require_once "parse_settings.php";
+
+
+
 
 
 
@@ -59,28 +61,43 @@
 
 	
 	
-	/************************* DATABASE * INITIALISATION **************************/
+	/*******************************************************************************
+	********************************************************************************
+	*************************** DATABASE * INITIALISATION **************************
+	********************************************************************************
+	*******************************************************************************/
+	$timestamp_database = microtime(TRUE);
+
 	$fullURL = "bolt://".$username.":".$password."@".$databaseURL.":".$databasePort;
 	$client = ClientBuilder::create()
 	    ->addConnection('bolt', $fullURL)
 	    ->build();
-	runQuery($client, "MATCH (n)-[r]->(n2) DELETE r");
+	runQuery($client, "MATCH (n)-[r:IS_INCLUDED_IN|:IS_REQUIRED_IN
+								|:IMPACTS|:DECLARES|:IS_USED_BY]
+								->(n2) DELETE r");
 	runQuery($client, "MATCH (n:Namespace), (f:Feature) DELETE n, f");
 	
 
-	# Already get file list to win time later
+	// Already get array from files with their modification date in last modelisation 
+	// to win time later
 	$filesInDB = array();
 	$result = runQuery($client, "MATCH (n:File) RETURN n.path as path, 
 						n.last_modified as last_modified");
 	foreach ($result->records() as $record) {
 		$path = $record->value('path');
 		$last_modified = $record->value('last_modified');
-		$filesInDB[$path] = $last_modified;
+		$filesInDB[$path] = Date::buildDateFromTimestamp($last_modified);
 	}
 
 	include_once "objects/Node.php";
 	Node::setOldFileList($filesInDB);
 	///displayArray(Node::getOldFileList());
+	$timestamp_database = microtime(TRUE) - $timestamp_database;
+
+
+
+
+
 
 
 	/*******************************************************************************
@@ -93,9 +110,9 @@
 		After this first step, every file, namespace, and feature will be represented
 		in the modeling. However, links between files won't be.
 	*/
-	echo "<h2>STEP 1 ANALYSE</h2>\n";
+	echo "############### STEP 1 ANALYSE ###############\n";
 	echo "Files to analyse : ".sizeof($files);
-	echo "\n\n\n\n";
+	echo "\n\n";
 
 	$timestamp_analyse = microtime(TRUE);
 	$nodes = array();
@@ -150,7 +167,7 @@
 		
 
 	}
-	echo "\nDone.\n\n\n\n\n";
+	echo "\n\n\nDone.\n\n";
 	$timestamp_analyse = microtime(TRUE) - $timestamp_analyse;
 
 
@@ -167,7 +184,7 @@
 	/**
 		STEP 2 : Read informations stored in every node, send relations in database.
 	*/
-	echo "<h2>STEP 2 UPLOAD DEPENDENCIES</h2>\n";
+	echo "############### STEP 2 UPLOAD DEPENDENCIES ###############\n\n";
 	$timestamp_dependencies = microtime(TRUE);
 	foreach ($nodes as $node) {
 		try {
@@ -187,8 +204,52 @@
 			printQueriesGenerationExceptionMessage($e, $node->getPath());
 		}
 	}
-	echo "\nDone.\n\n\n\n\n";
+	echo "\n\n\nDone.\n\n";
 	$timestamp_dependencies = microtime(TRUE) - $timestamp_dependencies;
+
+
+
+
+
+
+
+
+
+	/*******************************************************************************
+	********************************************************************************
+	***************** ADD * ITERATION * NODE * IN * DATABASE ***********************
+	********************************************************************************
+	*******************************************************************************/
+	/**
+		STEP 3 : Add iterations in database
+	*/
+	echo "############### STEP 3 ADD ITERATION ###############\n\n";
+	$timestamp_iteration = microtime(TRUE);
+
+	$repoName = $nodes[0]->getRepoName(); // All nodes belongs to the same repo
+	$atLeastOne = FALSE;
+	foreach ($nodes as $node) {
+		if ($node->getLastModified()->isBetween($iterationBegin, $iterationEnd)) {
+			$atLeastOne = TRUE;
+			$path = Node::getPathFromRepo($node->getPath(), $node->getRepoName());
+
+			$query = "MATCH  (f:File {path: '".$path."'}) 
+					  MERGE  (i:Iteration {name: '$iterationName', 
+					  					   project: '$repoName'}) 
+					  MERGE (f)-[:BELONGS_TO]->(i) ";
+			//echo $query."\n\n";
+			runQuery($client, $query);
+		}
+	}
+	if (!$atLeastOne) {
+		runQuery($client, "CREATE (i:Iteration {name: '$iterationName', 
+					  		project: '$repoName'})");
+	}
+
+	echo "\n\n\nDone.\n\n";
+	$timestamp_iteration = microtime(TRUE) - $timestamp_iteration;
+
+
 
 
 
@@ -201,13 +262,19 @@
 	*******************************************************************************/
 	$timestamp_full = microtime(TRUE) - $timestamp_full;
 
-	echo "<h2>PERFORMANCES</h2>\n";
-	echo "Time to load repository : ".number_format($timestamp_directory, 4)."s\n";
+	echo "############### PERFORMANCES ###############\n\n";
+	echo "Time to load repository : "
+		.number_format($timestamp_directory, 4)."s\n";
+	echo "Time to prepare database : "
+		.number_format($timestamp_database, 4)."s\n";
 	echo "Time to analyse repository : " 
 		.number_format($timestamp_analyse, 4)."s\n";
 	echo "Time to upload dependencies : "
 		.number_format($timestamp_dependencies, 4)."s\n";
+	echo "Time to add iteration : "
+		.number_format($timestamp_iteration, 4)."s\n";
 	echo "Script full running time : ".number_format($timestamp_full, 4)."s\n";
-	echo "\n\n";
+	
+	echo "\n\n\nExit.\n\n";
 
 ?>

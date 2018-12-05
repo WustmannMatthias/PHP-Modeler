@@ -155,12 +155,15 @@ Il faut ajouter a la bdd tous les namespaces du vendor, mais ne pas ajouter les 
 
 
 
+ETAPE 6 : Améliorer (un petit peu) l'expérience utilisateur
 
-ETAPE 6 : Ajouter des index et des constraints au graph (petite étape)
-
-Il faudra d'abord lire attentivement la documentation afin de comprendre ce que sont les index, et pourquoi peuvent ils être intéressants et utiles.
-
-
+Afin d'améliorer l'expérience utilisateur et de rendre le programme plus accessible, la création d'un fichier conf est souhaitable.
+	Le but est d'éviter de devoir préciser le nom du repository, les accès à la db, etc directement dans le code PHP.
+	J'ai donc créé un fichier settings, qui contient ces paramètres, et j'en ai profité pour en ajouter quelques un qui rendront le programme plus personnalisable, comme par exemple une liste de fichiers à de pas prendre en compte, une liste de sous répertoires à ne pas prendre en compte, les extensions à garder, si on prend ou non en compte les fichiers sans extensions, la syntaxe à utiliser pour la définition des features, etc.
+	Le fichier constants.inc est devenu obselète.
+	
+	Après réflexion, il s'est avéré que pour les paramètres les plus variables (repository, dates de l'itération), il était plus souhaitable d'avoir un petit script bash qui les demanderai à l'utilisateur, afin à d'éviter ce dernier de devoir modifier un fichier conf a chaque utilisation.
+	J'ai donc écrit un script, qui demande un URL d'un repo github, qui le clone ou le pull en fonction de si il existe déjà sur le disque, puis qui demande les dates de l'itération.-
 
 
 
@@ -191,11 +194,27 @@ AUTRE ETAPE :
 
 
 
-AUTRE ETAPE : 
-	Afin d'améliorer l'expérience utilisateur et de rendre le programme plus accessible, la création d'un fichier conf est souhaitable.
-	Le but est d'éviter de devoir préciser le nom du repository, les accès à la db, etc directement dans le code PHP.
-	J'ai donc créé un fichier settings, qui contient ces paramètres, et j'en ai profité pour en ajouter quelques un qui rendront le programme plus personnalisable, comme par exemple une liste de fichiers à de pas prendre en compte, une liste de sous répertoires à ne pas prendre en compte, les extensions à garder, si on prend ou non en compte les fichiers sans extensions, la syntaxe à utiliser pour la définition des features, etc.
-	Le fichier constants.inc est devenu obselète.
+
+AUTRE ETAPE : (qui vient des PROJETS)
+	Il faut ajouter les itérations à la base de données.
+	Plus généralement, il faut que la base ne soit pas détruite à chaque lancement du script.
+	
+	Stratégie : 
+		- Au lieu de vider la base au début du script, supprimer uniquement les relations use, require, include, impacts, declare ; les features et les namespace. Les File restent.
+		- Juste après, récupérer la liste des Node File de la base, ainsi que leur date de modification (à stocker dans un tableau)
+		- Lors de l'analyse, pour chaque fichier, on ne l'ajoute pas simplement dans la base comme auparavant. Il y a 3 cas : 
+			- il n'existe pas (c'est un nouveau fichier du projet) et on l'ajoute
+			- il existe et a une date de modif plus récente que son Node de la base -> on update sa date, sa size et son loc
+			- il existe et n'a pas changé -> on ne fait rien
+		- Ensuite, on retisse les relations avec les namespaces et features en fonction des résultats de l'analyse.
+		
+		- Le script bash launcher demande les dates et le nom de l'itération
+		- On ajoute une 3e etape a index.php : Ajouter les iterations dans la base. Il s'agit simplement de créer un noeud itération qui pointera sur les fichiers modifiées durant les dates de l'itération. -> nouvelle relation :BELONGS_TO
+		
+		Astuce : j'ai créé un objet php Date qui converti les timestamp en date et inversement, et qui propose des méthodes de comparaison isBefore et isAfter
+			-> Cet objet m'a également permi d'utiliser pour la première fois le pattern Factory (pas de surcharge de constructeur en php)
+
+
 
 
 

@@ -59,27 +59,49 @@ echo "REPOSITORY = $pathToRepo" > $iterationPath
 
 
 
-# Get Iteration dates
-echo "########## BEGINNING OF THE ITERATION ##########"
-read -p "Date AAAA-MM-DD : " -n 10 beginDate
-echo -e "\n"
-read -p "Hour HH:MM : " -n 5 beginHour
-echo -e "\n\n"
-echo -e "ITERATION_BEGIN = $beginDate, $beginHour" >> $iterationPath
 
-echo "############# END OF THE ITERATION #############"
-read -p "Date AAAA-MM-DD : " -n 10 endDate
+# Get Iteration parameters
+echo "################## ITERATION ##################"
+read -p "Reference : " reference
 echo -e "\n"
-read -p "Hour HH:MM : " -n 5 endHour
+echo -e "ITERATION_NAME = $reference" >> $iterationPath
+
+
+echo "--> Start"
+read -p "Year : " beginYear
+read -p "Month : " beginMonth
+read -p "Day : " beginDay
+read -p "Hour : " beginHour
+read -p "Minutes : " beginMinute
+echo -e "ITERATION_BEGIN_YEAR 	= $beginYear" >> $iterationPath
+echo -e "ITERATION_BEGIN_MONTH 	= $beginMonth" >> $iterationPath
+echo -e "ITERATION_BEGIN_DAY 	= $beginDay" >> $iterationPath
+echo -e "ITERATION_BEGIN_HOUR 	= $beginHour" >> $iterationPath
+echo -e "ITERATION_BEGIN_MINUTE	= $beginMinute" >> $iterationPath
+beginDate="$beginYear-$beginMonth-$beginDay $beginHour:$beginMinute"
+
+echo -e "\n"
+echo "--> Freeze"
+read -p "Year : " endYear
+read -p "Month : " endMonth
+read -p "Day : " endDay
+read -p "Hour : " endHour
+read -p "Minutes : " endMinute
+echo -e "ITERATION_END_YEAR 	= $endYear" >> $iterationPath
+echo -e "ITERATION_END_MONTH 	= $endMonth" >> $iterationPath
+echo -e "ITERATION_END_DAY	 	= $endDay" >> $iterationPath
+echo -e "ITERATION_END_HOUR 	= $endHour" >> $iterationPath
+echo -e "ITERATION_END_MINUTE	= $endMinute" >> $iterationPath
+endDate="$endYear-$endMonth-$endDay $endHour:$endMinute"
+
 echo -e "\n\n"
-echo -e "ITERATION_END = $endDate, $endHour" >> $iterationPath
 
 
 # Ask for confirmation
 echo "################# CONFIRMATION #################"
 echo -e "Repository : $repo\n"
-echo -e "Begin of the iteration : $beginDate, $beginHour\n" 
-echo -e "Begin of the iteration : $endDate, $endHour\n"
+echo -e "Begin of the iteration : $beginDate\n" 
+echo -e "Begin of the iteration : $endDate\n"
 read -p "Proceed ? (Y/n)" -n 1 proceed
 if [ $proceed != 'y' ] && [ $proceed != 'Y' ]
 then 

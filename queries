@@ -54,3 +54,30 @@ Find files affecting a feature :
 
 MATCH (file:File)-[:IS_INCLUDED_IN|:IS_REQUIRED_IN|:IS_USED_BY|:IMPACTS|:DECLARES*0..]->(feature:Feature {name:"$feature" }) RETURN DISTINCT file.path AS file
 
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Find all features to test when iteration is frozen :
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+MATCH (i:Iteration {name: $iterationName}) 
+MATCH (files:File)-[:BELONGS_TO]->(i)
+MATCH (files)-[:IS_INCLUDED_IN|:IS_REQUIRED_IN|:IS_USED_BY|:IMPACTS|:DECLARES*0..]->(feature:Feature)
+RETURN DISTINCT feature.name AS feature
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
