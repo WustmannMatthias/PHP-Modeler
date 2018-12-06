@@ -116,7 +116,7 @@ cd $softwareDirectory
 
 echo -e "\n"
 echo -e "Starting...\n"
-php index.php
+php crawler.php
 
 
 
