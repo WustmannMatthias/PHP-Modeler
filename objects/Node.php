@@ -647,7 +647,7 @@
 		/**
 			Generates à Cypher Query that creates a Node for this instance in the 
 			neo4j Database
-			If the file belongs to the vendor directory, it must not be added to the graph.
+			If the file be……longs to the vendor directory, it must not be added to the graph.
 			However, the namespaces it contains has to be.
 
 			@return is a either a bool or a String
@@ -676,6 +676,7 @@
 									." , loc: ".intval($this->_loc)
 									." , last_modified: ".$this->_lastModified->getTimestamp()
 									." , extension: '".$this->_extension
+									."', repository: '".$this->_repoName
 									."'}) ";
 				}
 				else {
@@ -731,7 +732,7 @@
 			}
 
 			//Just in case there is nothing after a Match
-			$query.= " RETURN n";
+			$query.= " RETURN null";
 
 			//echo $query."\n";
 			return $query;

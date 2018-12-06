@@ -94,25 +94,21 @@
 	
 	//echo $query."\n";
 	
-	runQuery($client, "MATCH (repoFiles:File),
+	runQuery($client, "MATCH (repoFiles:File {repository: '$repoName'}),
 						(repoFiles)<-[repoUses:IS_USED_BY]-(:Namespace)
-						WHERE repoFiles.path STARTS WITH '$repoName'
 						DELETE repoUses");
 
-	runQuery($client, "MATCH (repoFiles:File),
+	runQuery($client, "MATCH (repoFiles:File {repository: '$repoName'}),
 						(repoNS:Namespace)<-[repoNSDeclarations:DECLARES]-(repoFiles)
-						WHERE repoFiles.path STARTS WITH '$repoName'
 						DELETE repoNSDeclarations, repoNS");
 
-	runQuery($client, "MATCH (repoFiles:File),
+	runQuery($client, "MATCH (repoFiles:File {repository: '$repoName'}),
 						(repoFeatures:Feature)<-[repoImpacts:IMPACTS]-(repoFiles)
-						WHERE repoFiles.path STARTS WITH '$repoName'
 						DELETE repoImpacts, repoFeatures");
 
-	runQuery($client, "MATCH (repoFiles:File),
+	runQuery($client, "MATCH (repoFiles:File {repository: '$repoName'}),
 						(:File)-[repoInclusions:IS_REQUIRED_IN|:IS_INCLUDED_IN]
 						->(repoFiles)
-						WHERE repoFiles.path STARTS WITH '$repoName'
 						DELETE repoInclusions");
 	
 
