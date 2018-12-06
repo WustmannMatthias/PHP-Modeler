@@ -376,7 +376,7 @@
 					$output[$variableName] = explode('"', $line)[1];
 				}
 				else if (strpos($line, "'")) {
-					$output[$variableName] = explode('"', $line)[1];
+					$output[$variableName] = explode("'", $line)[1];
 				}
 				else {
 					throw new UnunderstoodVariableDeclarationException($this->_path, 
