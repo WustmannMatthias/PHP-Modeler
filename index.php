@@ -66,16 +66,54 @@
 	*************************** DATABASE * INITIALISATION **************************
 	********************************************************************************
 	*******************************************************************************/
+	/**
+		Project layer : 
+		We want to keep relation between :File nodes and :Iteration nodes, to have
+		a history of modification.
+		-> Just remove everything that is not a File or an Iteration, and remove All
+			relations bewteen files : thoses will be reanalysed and remodeled.
+			Then Node class will take care of making updates and reupload dependencies,
+			features, namespaces.
+
+		Database Layer : 
+		We want to do the same, but only with the project we are analysing : every other
+		repositories represented in the database have to be left alone
+	*/
 	$timestamp_database = microtime(TRUE);
 
 	$fullURL = "bolt://".$username.":".$password."@".$databaseURL.":".$databasePort;
 	$client = ClientBuilder::create()
 	    ->addConnection('bolt', $fullURL)
 	    ->build();
+	/*
 	runQuery($client, "MATCH (n)-[r:IS_INCLUDED_IN|:IS_REQUIRED_IN
 								|:IMPACTS|:DECLARES|:IS_USED_BY]
 								->(n2) DELETE r");
 	runQuery($client, "MATCH (n:Namespace), (f:Feature) DELETE n, f");
+	*/
+	
+	//echo $query."\n";
+	
+	runQuery($client, "MATCH (repoFiles:File),
+						(repoFiles)<-[repoUses:IS_USED_BY]-(:Namespace)
+						WHERE repoFiles.path STARTS WITH '$repoName'
+						DELETE repoUses");
+
+	runQuery($client, "MATCH (repoFiles:File),
+						(repoNS:Namespace)<-[repoNSDeclarations:DECLARES]-(repoFiles)
+						WHERE repoFiles.path STARTS WITH '$repoName'
+						DELETE repoNSDeclarations, repoNS");
+
+	runQuery($client, "MATCH (repoFiles:File),
+						(repoFeatures:Feature)<-[repoImpacts:IMPACTS]-(repoFiles)
+						WHERE repoFiles.path STARTS WITH '$repoName'
+						DELETE repoImpacts, repoFeatures");
+
+	runQuery($client, "MATCH (repoFiles:File),
+						(:File)-[repoInclusions:IS_REQUIRED_IN|:IS_INCLUDED_IN]
+						->(repoFiles)
+						WHERE repoFiles.path STARTS WITH '$repoName'
+						DELETE repoInclusions");
 	
 
 	// Already get array from files with their modification date in last modelisation 
@@ -225,8 +263,12 @@
 	*/
 	echo "############### STEP 3 ADD ITERATION ###############\n\n";
 	$timestamp_iteration = microtime(TRUE);
-
+	
+	// Just prepare variables
+	$begin 	= $iterationBegin->getTimestamp();
+	$end 	= $iterationEnd->getTimestamp();
 	$repoName = $nodes[0]->getRepoName(); // All nodes belongs to the same repo
+	
 	$atLeastOne = FALSE;
 	foreach ($nodes as $node) {
 		if ($node->getLastModified()->isBetween($iterationBegin, $iterationEnd)) {
@@ -235,15 +277,20 @@
 
 			$query = "MATCH  (f:File {path: '".$path."'}) 
 					  MERGE  (i:Iteration {name: '$iterationName', 
-					  					   project: '$repoName'}) 
+					  					   project: '$repoName',
+					  					   begin: $begin,
+					  					   end: $end }) 
 					  MERGE (f)-[:BELONGS_TO]->(i) ";
 			//echo $query."\n\n";
 			runQuery($client, $query);
 		}
 	}
+
 	if (!$atLeastOne) {
 		runQuery($client, "CREATE (i:Iteration {name: '$iterationName', 
-					  		project: '$repoName'})");
+												project: '$repoName', 
+												begin: $begin, 
+												end: $end })");
 	}
 
 	echo "\n\n\nDone.\n\n";

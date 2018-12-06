@@ -60,7 +60,7 @@ MATCH (file:File)-[:IS_INCLUDED_IN|:IS_REQUIRED_IN|:IS_USED_BY|:IMPACTS|:DECLARE
 Find all features to test when iteration is frozen :
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-MATCH (i:Iteration {name: $iterationName}) 
+MATCH (i:Iteration {name: $iterationName, project: '$projectName'}) 
 MATCH (files:File)-[:BELONGS_TO]->(i)
 MATCH (files)-[:IS_INCLUDED_IN|:IS_REQUIRED_IN|:IS_USED_BY|:IMPACTS|:DECLARES*0..]->(feature:Feature)
 RETURN DISTINCT feature.name AS feature

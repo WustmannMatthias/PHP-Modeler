@@ -100,7 +100,7 @@ echo -e "\n\n"
 # Ask for confirmation
 echo "################# CONFIRMATION #################"
 echo -e "Repository : $repo\n"
-echo -e "Begin of the iteration : $beginDate\n" 
+echo -e "Begin of the iteration : $beginDate\n"
 echo -e "Begin of the iteration : $endDate\n"
 read -p "Proceed ? (Y/n)" -n 1 proceed
 if [ $proceed != 'y' ] && [ $proceed != 'Y' ]
