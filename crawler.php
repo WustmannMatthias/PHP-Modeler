@@ -263,28 +263,25 @@
 	$end 	= $iterationEnd->getTimestamp();
 	$repoName = $nodes[0]->getRepoName(); // All nodes belongs to the same repo
 	
-	$atLeastOne = FALSE;
+
+	runQuery($client, "MERGE (i:Iteration {name: '$iterationName', 
+												begin: $begin, 
+												end: $end })");
 	foreach ($nodes as $node) {
 		if ($node->getLastModified()->isBetween($iterationBegin, $iterationEnd)) {
 			$atLeastOne = TRUE;
 			$path = Node::getPathFromRepo($node->getPath(), $node->getRepoName());
 
-			$query = "MATCH  (f:File {path: '".$path."'}) 
-					  MERGE  (i:Iteration {name: '$iterationName', 
-					  					   project: '$repoName',
+			$query = "MATCH  (f:File {path: '".$path."'})
+					  MATCH  (i:Iteration {name: '$iterationName',
 					  					   begin: $begin,
 					  					   end: $end }) 
+					  MERGE  (p:Project {name: '$repoName'})
+					  MERGE  (i)-[:IS_ITERATION_OF]->(p)
 					  MERGE (f)-[:BELONGS_TO]->(i) ";
 			//echo $query."<br><br>";
 			runQuery($client, $query);
 		}
-	}
-
-	if (!$atLeastOne) {
-		runQuery($client, "CREATE (i:Iteration {name: '$iterationName', 
-												project: '$repoName', 
-												begin: $begin, 
-												end: $end })");
 	}
 
 	echo "<br><br><br>Done.<br><br>";

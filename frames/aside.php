@@ -21,7 +21,7 @@
 	/**
 		Get list of all projects in database
 	*/
-	$query = "MATCH (i:Iteration) RETURN DISTINCT i.project as project";
+	$query = "MATCH (p:Project) RETURN p.name as project";
 	$result = runQuery($client, $query);
 
 	$dynamicMenu = "";
