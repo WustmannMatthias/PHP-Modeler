@@ -4,7 +4,6 @@
 	*/
 
 
-	require_once "functions/display_exceptions_functions.php";
 /**
 	Allows to run a query to a connected neo4j database, and catch potential Exceptions
 	@param client is the link to the database

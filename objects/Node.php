@@ -4,8 +4,6 @@
 		§§ File scan
 		§§ Query generation 
 	*/
-
-	require_once "functions/common_functions.php";
 	
 
 

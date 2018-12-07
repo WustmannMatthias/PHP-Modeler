@@ -1,8 +1,8 @@
 <?php
 
 
-	require_once "functions/database_functions.php";
-	require_once 'vendor/autoload.php';
+	require_once "../functions/database_functions.php";
+	require_once '../vendor/autoload.php';
 
 
 	use GraphAware\Neo4j\Client\ClientBuilder;

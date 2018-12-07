@@ -1,0 +1,85 @@
+<?php
+	/**
+		§§ Parse Settings
+	*/
+	require_once 'functions/common_functions.php';
+
+	/**
+		Just separate multiple parameters and returns an array with all trimed parameters
+		@param parameters is the String with parameters in it
+		@param separator is the caracter used to separate parameters
+		@return is an array
+	*/
+	function parseParameters($parameters) {
+		$output = array();
+		$parametersArray = explode(',', $parameters);
+		foreach ($parametersArray as $parameter) {
+			array_push($output, trim($parameter));
+		}
+		return $output;
+	}
+
+
+
+
+	/******************* PARSE ITERATION FILE *********************/
+
+	$iterationSettings = parse_ini_file("data/general_settings/iteration", true, INI_SCANNER_NORMAL);
+
+	$project = $iterationSettings['REPOSITORY'];
+	$repository = "data/projects/$project";
+	$repoName = getRepoName($repository);
+	$iterationName 	= $iterationSettings['ITERATION_NAME'];
+	
+	$iterationBegin = Date::buildDateFromAmericanFormat (	
+								$iterationSettings['DATE_BEGIN'],
+								$iterationSettings['TIME_BEGIN']
+					);
+	
+	$iterationEnd 	= Date::buildDateFromAmericanFormat (	 
+								$iterationSettings['DATE_END'],
+							  	$iterationSettings['TIME_END']
+					);
+
+
+
+
+
+
+	/******************* PARSE PROJECT SETTINGS FILE *********************/
+
+	$settings = parse_ini_file("data/projects_settings/$project", true, 
+								INI_SCANNER_NORMAL);
+	
+	$extensions = parseParameters($settings['EXTENSIONS']);
+	
+	$noExtensionFiles = $settings['NO_EXTENSION_FILES'];
+
+	$featureSyntax = $settings['FEATURE_SYNTAX'];
+
+	$subDirectoriesToIgnore = parseParameters($settings['SUB_DIRECTORIES']);
+	array_push($subDirectoriesToIgnore, '.', '..');
+	$subDirectoriesToIgnore = array_unique($subDirectoriesToIgnore);
+
+	$filesToIgnore = parseParameters($settings['FILES']);
+
+
+
+
+
+	/******************* PARSE DATABASE SETTINGS FILE *********************/
+	unset($settings);
+	
+	$settings = parse_ini_file("data/general_settings/database", true, 
+								INI_SCANNER_NORMAL);
+	$databaseURL = $settings['DATABASE_URL'];
+	$databasePort = $settings['DATABASE_PORT'];
+	$username = $settings['USERNAME'];
+	$password = $settings['PASSWORD'];
+
+
+
+	//displayArray($settings);
+
+
+?>

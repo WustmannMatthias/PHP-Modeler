@@ -26,9 +26,7 @@
 	
 
 	//Get user settings
-	require_once "parse_settings.php";
-
-
+	require_once "programs/parse_settings.php";
 
 
 
@@ -47,8 +45,8 @@
 	}
 	catch (RepositoryScanException $e) {
 		echo $e->getMessage();
-		echo "\n";
-		echo "Can't scan repository. Program end.\n";
+		echo "<br>";
+		echo "Can't scan repository. Program end.<br>";
 		exit();
 	}
 	
@@ -144,9 +142,9 @@
 		After this first step, every file, namespace, and feature will be represented
 		in the modeling. However, links between files won't be.
 	*/
-	echo "############### STEP 1 ANALYSE ###############\n";
+	echo "############### STEP 1 ANALYSE ###############<br>";
 	echo "Files to analyse : ".sizeof($files);
-	echo "\n\n";
+	echo "<br><br>";
 
 	$timestamp_analyse = microtime(TRUE);
 	$nodes = array();
@@ -201,7 +199,7 @@
 		
 
 	}
-	echo "\n\n\nDone.\n\n";
+	echo "<br><br><br>Done.<br><br>";
 	$timestamp_analyse = microtime(TRUE) - $timestamp_analyse;
 
 
@@ -218,7 +216,7 @@
 	/**
 		STEP 2 : Read informations stored in every node, send relations in database.
 	*/
-	echo "############### STEP 2 UPLOAD DEPENDENCIES ###############\n\n";
+	echo "############### STEP 2 UPLOAD DEPENDENCIES ###############<br><br>";
 	$timestamp_dependencies = microtime(TRUE);
 	foreach ($nodes as $node) {
 		try {
@@ -238,7 +236,7 @@
 			printQueriesGenerationExceptionMessage($e, $node->getPath());
 		}
 	}
-	echo "\n\n\nDone.\n\n";
+	echo "<br><br><br>Done.<br><br>";
 	$timestamp_dependencies = microtime(TRUE) - $timestamp_dependencies;
 
 
@@ -257,7 +255,7 @@
 	/**
 		STEP 3 : Add iterations in database
 	*/
-	echo "############### STEP 3 ADD ITERATION ###############\n\n";
+	echo "############### STEP 3 ADD ITERATION ###############<br><br>";
 	$timestamp_iteration = microtime(TRUE);
 	
 	// Just prepare variables
@@ -277,7 +275,7 @@
 					  					   begin: $begin,
 					  					   end: $end }) 
 					  MERGE (f)-[:BELONGS_TO]->(i) ";
-			//echo $query."\n\n";
+			//echo $query."<br><br>";
 			runQuery($client, $query);
 		}
 	}
@@ -289,7 +287,7 @@
 												end: $end })");
 	}
 
-	echo "\n\n\nDone.\n\n";
+	echo "<br><br><br>Done.<br><br>";
 	$timestamp_iteration = microtime(TRUE) - $timestamp_iteration;
 
 
@@ -305,19 +303,22 @@
 	*******************************************************************************/
 	$timestamp_full = microtime(TRUE) - $timestamp_full;
 
-	echo "############### PERFORMANCES ###############\n\n";
+	echo "############### PERFORMANCES ###############<br><br>";
 	echo "Time to load repository : "
-		.number_format($timestamp_directory, 4)."s\n";
+		.number_format($timestamp_directory, 4)."s<br>";
 	echo "Time to prepare database : "
-		.number_format($timestamp_database, 4)."s\n";
+		.number_format($timestamp_database, 4)."s<br>";
 	echo "Time to analyse repository : " 
-		.number_format($timestamp_analyse, 4)."s\n";
+		.number_format($timestamp_analyse, 4)."s<br>";
 	echo "Time to upload dependencies : "
-		.number_format($timestamp_dependencies, 4)."s\n";
+		.number_format($timestamp_dependencies, 4)."s<br>";
 	echo "Time to add iteration : "
-		.number_format($timestamp_iteration, 4)."s\n";
-	echo "Script full running time : ".number_format($timestamp_full, 4)."s\n";
+		.number_format($timestamp_iteration, 4)."s<br>";
+	echo "Script full running time : ".number_format($timestamp_full, 4)."s<br>";
 	
-	echo "\n\n\nExit.\n\n";
+	echo "<br><br><br>Exit.<br><br>";
+
+
+	echo "<a href='index.php'>Back to homepage</a>";
 
 ?>

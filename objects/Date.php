@@ -57,6 +57,25 @@
 		}
 
 
+		public static function buildDateFromAmericanFormat($ymd, $hi) {
+			$date = new Date();
+
+			$ymd 	= explode('-', $ymd);
+			$hi 	= explode(':', $hi);
+			
+			$date->_year 	= $ymd[0];
+			$date->_month 	= $ymd[1];
+			$date->_day 	= $ymd[2];
+
+			$date->_hour 	= $hi[0];
+			$date->_minute 	= $hi[1];
+
+			$date->_timestamp = $date->computeTimestamp($ymd[0], $ymd[1], $ymd[2], 
+												$hi[0], $hi[1], 0);
+
+			return $date;
+		}
+
 
 
 
