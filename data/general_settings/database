@@ -1,0 +1,4 @@
+DATABASE_URL 	= "localhost"
+DATABASE_PORT 	= 7687
+USERNAME		= "neo4j"
+PASSWORD		= "password"

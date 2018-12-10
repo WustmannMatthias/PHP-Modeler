@@ -6,4 +6,5 @@
 /vendor/
 /composer.lock
 
-/data/
+/data/projects
+/data/project_settings

@@ -35,7 +35,9 @@
 		$isActive = isset($_GET['project']) && $_GET['project'] == $project;
 
 		$classes = "list-group-item";
-		if ($isActive) $classes.= " active";
+		if ($isActive) {
+			$classes.= " active";
+		}
 
 		$dynamicMenu.= "<a href='index.php?project=$project'>
 							<li class='$classes'>$project</li>
@@ -46,10 +48,16 @@
 
 <aside>
 	<ul class="list-group">
+		<a href="index.php?home">
+			<li class="list-group-item <?php if (isset($_GET['home'])
+				|| $_SERVER['QUERY_STRING'] == "") echo 'active '; ?>">
+				Home
+			</li>
+		</a>
 		<a href="index.php?new_project">
 			<li class="list-group-item <?php if (isset($_GET['new_project'])) echo 'active'; ?>"> New project...</li>
 		</a>
-		<a>
+		<a href="index.php?request_database">
 			<li class="list-group-item <?php if (isset($_GET['request_database'])) echo 'active'; ?>">Request database</li>
 		</a>
 		<?php echo $dynamicMenu; ?>

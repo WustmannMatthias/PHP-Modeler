@@ -1,7 +1,8 @@
 <?php
 	session_start();
 
-	foreach(parse_ini_file('data/general_settings/database') as $key => $value) {
+	foreach(parse_ini_file('data/general_settings/database') 
+		as $key => $value) {
 		$_SESSION[$key] = $value;	
 	}
 
@@ -28,19 +29,26 @@
 				<!--MAIN SCREEN-->
 				<div class="col-lg-10 no_margin">
 					<?php 
-						if (isset($_GET['new_project'])) {
+						if (isset($_GET['home']) 
+							|| $_SERVER['QUERY_STRING'] == "") {
+							include "frames/home.php";
+						}						
+						else if (isset($_GET['new_project'])) {
 							include "frames/new_project.php"; 	
 						}
-						else if (isset($_GET['request_database'])) {
-							include "frames/request_database.php";
+						else if (isset($_GET['query_database'])) {
+							include "frames/query_database.php"; 	
 						}
 						else if (isset($_GET['project'])) {
 							include "frames/project_manager.php";
 						}
+						else {
+							echo "404 not found";
+						}
 					?>
 				</div>
 
-				<!--NAV-->
+				<!--ASIDE MENU-->
 				<div class="col-lg-2 no_margin">
 					<?php include "frames/aside.php" ?>
 				</div>
