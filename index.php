@@ -42,6 +42,9 @@
 						else if (isset($_GET['project'])) {
 							include "frames/project_manager.php";
 						}
+						else if (isset($_GET['features'])) {
+							include "frames/features.php";
+						}
 						else {
 							echo "404 not found";
 						}

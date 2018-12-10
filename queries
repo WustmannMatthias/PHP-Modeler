@@ -64,8 +64,9 @@ MATCH (p:Project {name: '$project'})
 MATCH (i:Iteration {name: '$iteration'})-[:IS_ITERATION_OF]->(p)
 MATCH (files:File)-[:BELONGS_TO]->(i)
 MATCH (files)-[:IS_INCLUDED_IN|:IS_REQUIRED_IN|:IS_USED_BY|:IMPACTS|:DECLARES*0..]->(feature:Feature)
+WITH feature
+ORDER BY feature.name ASC 
 RETURN DISTINCT feature.name AS feature
-
 
 
 

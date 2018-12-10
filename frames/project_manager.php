@@ -82,7 +82,8 @@
 		</div>
 
 		<div class="row">
-			<button class="btn btn-primary pull-right" type="submit" name="changeSettings">Change settings</button>
+			<button class="btn btn-primary pull-right" type="submit" 
+					name="changeSettings">Change settings</button>
 		</div>
 	</form>
 </div>
