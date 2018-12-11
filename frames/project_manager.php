@@ -1,3 +1,4 @@
+
 <?php
 	if (isset($_GET['project'])) {
 		$project = $_GET['project'];
@@ -108,14 +109,17 @@
 		if (isset($_POST['registerIteration'])) {
 			$iterationSettings = "REPOSITORY=".$project."\n";
 			if (isset($_POST['iterationName'])) $iterationSettings.="ITERATION_NAME=".$_POST['iterationName']."\n";
-			if (isset($_POST['dateBegin'])) $iterationSettings.="DATE_BEGIN=".$_POST['dateBegin']."\n";
-			if (isset($_POST['timeBegin'])) $iterationSettings.="TIME_BEGIN=".$_POST['timeBegin']."\n";
-			if (isset($_POST['dateEnd'])) $iterationSettings.="DATE_END=".$_POST['dateEnd']."\n";
-			if (isset($_POST['timeEnd'])) $iterationSettings.="TIME_END=".$_POST['timeEnd']."\n";
+			if (isset($_POST['dateBegin'])) $iterationSettings.= "DATE_BEGIN=".$_POST['dateBegin']."\n";
+			if (isset($_POST['timeBegin'])) $iterationSettings.= "TIME_BEGIN=".$_POST['timeBegin']."\n";
+			if (isset($_POST['dateEnd'])) $iterationSettings.= "DATE_END=".$_POST['dateEnd']."\n";
+			if (isset($_POST['timeEnd'])) $iterationSettings.= "TIME_END=".$_POST['timeEnd']."\n";
 
 			file_put_contents($iterationFile, $iterationSettings);
 
-			header("Location: crawler.php");
+			echo "<script type='text/javascript' src='style/loading.js'>
+					</script>";
+
+			//header("Location: crawler.php");
 		}
 	?>
 
@@ -124,7 +128,7 @@
 	<div class="row">
 		<h2>New Iteration</h2>
 
-		<form class="col-lg-6 col-lg-offset-2 form-horizontal" method="post" action="index.php?project=<?php echo $project;?>">
+		<form class="col-lg-6 col-lg-offset-2 form-horizontal crawler_caller" method="post" action="index.php?project=<?php echo $project;?>">
 			<div class="row form-group">
 				<label class="col-lg-6 control-label">Iteration name</label>
 				<input class="col-lg-6" type="text" name="iterationName" required="required" />
@@ -154,31 +158,9 @@
 	</div>	
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<br><br><br>
+<div id="loading"></div>
+<pre id="result"></pre>
 
 
 
