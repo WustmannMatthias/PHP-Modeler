@@ -1,5 +1,11 @@
+* {
+	font-size: 1.02em;
+}
+
+
+
 body {
-	
+	background-color: #F0F0F0;
 }
 
 
@@ -26,4 +32,11 @@ body {
 
 h1 {
 	margin-bottom: 7.5vh;
+	font-weight: bold;
+}
+
+
+
+#iteration_select, #iteration_submit {
+	display: none;
 }
