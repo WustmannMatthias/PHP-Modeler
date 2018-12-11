@@ -4,7 +4,7 @@
 ?>
 
 <div class="row">
-	<h1>Add a new project in database</h1>
+	<h1 class="center">Add a new project in database</h1>
 
 </div>
 

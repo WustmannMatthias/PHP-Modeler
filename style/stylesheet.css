@@ -22,3 +22,8 @@ body {
 .center {
 	text-align: center;
 }
+
+
+h1 {
+	margin-bottom: 7.5vh;
+}

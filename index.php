@@ -28,27 +28,29 @@
 			<div class="row">
 				<!--MAIN SCREEN-->
 				<div class="col-lg-10 no_margin">
-					<?php 
-						if (isset($_GET['home']) 
-							|| $_SERVER['QUERY_STRING'] == "") {
-							include "frames/home.php";
-						}						
-						else if (isset($_GET['new_project'])) {
-							include "frames/new_project.php"; 	
-						}
-						else if (isset($_GET['query_database'])) {
-							include "frames/query_database.php"; 	
-						}
-						else if (isset($_GET['project'])) {
-							include "frames/project_manager.php";
-						}
-						else if (isset($_GET['features'])) {
-							include "frames/features.php";
-						}
-						else {
-							echo "404 not found";
-						}
-					?>
+					<div class="container">
+						<?php 
+							if (isset($_GET['home']) 
+								|| $_SERVER['QUERY_STRING'] == "") {
+								include "frames/home.php";
+							}						
+							else if (isset($_GET['new_project'])) {
+								include "frames/new_project.php"; 	
+							}
+							else if (isset($_GET['query_database'])) {
+								include "frames/query_database.php"; 	
+							}
+							else if (isset($_GET['project'])) {
+								include "frames/project_manager.php";
+							}
+							else if (isset($_GET['features'])) {
+								include "frames/features.php";
+							}
+							else {
+								echo "404 not found";
+							}
+						?>
+					</div>
 				</div>
 
 				<!--ASIDE MENU-->

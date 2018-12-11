@@ -45,7 +45,7 @@
 	$settings = parse_ini_file($settingsFile);
 ?>
 
-<h1><?php echo $project ?></h1>
+<h1 class="center"><?php echo $project ?></h1>
 <div class="row">
 
 	<h2>Settings</h2>

@@ -37,7 +37,7 @@
 ?>
 
 <div class="row">
-	<h1>Features to test</h1>
+	<h1 class="center">Features to test</h1>
 </div>
 
 <div class="row">
@@ -119,11 +119,11 @@
 
 			$query = "MATCH (p:Project {name: '$project'}) 
 						MATCH (i:Iteration {name: '$iteration'})-[:IS_ITERATION_OF]->(p)
-						MATCH (files:File)-[:BELONGS_TO]->(i)
-						MATCH (files)-[:IS_INCLUDED_IN|:IS_REQUIRED_IN|:IS_USED_BY|:IMPACTS|:DECLARES*0..]->(feature:Feature)
+						MATCH (i)<-[:BELONGS_TO]-(files)-[:IS_INCLUDED_IN|:IS_REQUIRED_IN|:IS_USED_BY|:IMPACTS|:DECLARES*0..]->(feature:Feature)
 						WITH feature
 						ORDER BY feature.name ASC 
 						RETURN DISTINCT feature.name AS feature";
+
 			$result = runQuery($client, $query);
 
 			foreach ($result->records() as $record) {
