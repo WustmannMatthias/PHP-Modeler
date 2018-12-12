@@ -31,3 +31,4 @@ Go to the user interface of PHP-Modeler simply by typing following URL in the UR
 localhost/PHP-Modeler
 ```
 and follow the instructions !
+
