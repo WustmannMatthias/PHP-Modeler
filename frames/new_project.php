@@ -26,7 +26,7 @@
 			if (isset($_POST['project'])) {
 				$project = $_POST['project'];
 
-				if (!is_dir("/var/www/html/application_modeling_2.0/data/projects/$project")) {
+				if (!is_dir("/var/www/html/PHP-Modeller/data/projects/$project")) {
 					echo "<div class='row'>
 							<div class='col-lg-8 col-lg-offset-4 alert alert-warning'>No directory with the given name was found in data/projects. Make sure to clone the repository before continuing.</div>
 						</div>";
@@ -89,7 +89,7 @@
 
 		<div class="row form-group">
 			<label class="col-lg-6 control-label">Sub-directories to ignore</label>
-			<input class="col-lg-6" type="text" name="subDirectories" required="required" value="" />
+			<input class="col-lg-6" type="text" name="subDirectories" value="" />
 		</div>
 
 		<div class="row form-group">
@@ -113,7 +113,7 @@
 
 		$project = $_SESSION['project'];
 
-		$settingsFile = "/var/www/html/application_modeling_2.0/data/projects_settings/$project";
+		$settingsFile = "/var/www/html/PHP-Modeller/data/projects_settings/$project";
 		
 		$settings = "";
 		if (isset($_POST['extensions'])) $settings.="EXTENSIONS=".$_POST['extensions']."\n";
@@ -129,7 +129,7 @@
 		/**
 			CREATE FIRST ITERATION CONFIG FILE
 		*/
-		$iterationFile = "/var/www/html/application_modeling_2.0/data/general_settings/iteration";
+		$iterationFile = "/var/www/html/PHP-Modeller/data/general_settings/iteration";
 
 		$iterationSettings = "REPOSITORY=$project\n";
 		$iterationSettings.= "ITERATION_NAME=initialisation\n";

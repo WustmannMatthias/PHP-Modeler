@@ -9,8 +9,8 @@
 	}
 
 
-	$settingsFile = "/var/www/html/application_modeling_2.0/data/projects_settings/$project";
-	$projectDirectory = "/var/www/html/application_modeling_2.0/data/projects/$project";
+	$settingsFile = "/var/www/html/PHP-Modeller/data/projects_settings/$project";
+	$projectDirectory = "/var/www/html/PHP-Modeller/data/projects/$project";
 
 	//Check if project is loadable
 	if (!is_dir($projectDirectory)) {
@@ -49,7 +49,7 @@
 <h1 class="center"><?php echo $project ?></h1>
 <div class="row">
 
-	<h2>Settings</h2>
+	<h2 class="first_h2">Settings</h2>
 
 	<form class="col-lg-6 col-lg-offset-2 form-horizontal" method="post" action="index.php?project=<?php echo $project;?>">
 		<div class="row form-group">
@@ -74,7 +74,7 @@
 
 		<div class="row form-group">
 			<label class="col-lg-6 control-label">Sub-directories to ignore</label>
-			<input class="col-lg-6" type="text" name="subDirectories" required="required" value="<?php echo $settings['SUB_DIRECTORIES'];?>" />
+			<input class="col-lg-6" type="text" name="subDirectories" value="<?php echo $settings['SUB_DIRECTORIES'];?>" />
 		</div>
 
 		<div class="row form-group">
@@ -104,7 +104,7 @@
 	/**
 		NEW ITERATION
 	*/
-		$iterationFile = "/var/www/html/application_modeling_2.0/data/general_settings/iteration";
+		$iterationFile = "/var/www/html/PHP-Modeller/data/general_settings/iteration";
 
 		if (isset($_POST['registerIteration'])) {
 			$iterationSettings = "REPOSITORY=".$project."\n";
@@ -130,7 +130,7 @@
 
 		<form class="col-lg-6 col-lg-offset-2 form-horizontal crawler_caller" method="post" action="index.php?project=<?php echo $project;?>">
 			<div class="row form-group">
-				<label class="col-lg-6 control-label">Iteration name</label>
+				<label class="col-lg-6 control-label">Iteration reference</label>
 				<input class="col-lg-6" type="text" name="iterationName" required="required" />
 			</div>
 			

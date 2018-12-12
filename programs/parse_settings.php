@@ -58,7 +58,7 @@
 	$featureSyntax = $settings['FEATURE_SYNTAX'];
 
 	$subDirectoriesToIgnore = parseParameters($settings['SUB_DIRECTORIES']);
-	array_push($subDirectoriesToIgnore, '.', '..');
+	array_push($subDirectoriesToIgnore, '.', '..', '.git');
 	$subDirectoriesToIgnore = array_unique($subDirectoriesToIgnore);
 
 	$filesToIgnore = parseParameters($settings['FILES']);
