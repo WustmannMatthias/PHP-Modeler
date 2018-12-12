@@ -1,5 +1,6 @@
 # PHP Modeler
 This project allows to model the architecture of any PHP application into a Graph database. It supposes you annotate your php files with their corresponding features in your applications.
+
 Once modelled, PHP Modeler will allow you to have a better understanding of the topology of your projects, will give you some useful informations and statistics, like useless namespaces or broken dependencies, but will mainly help you to analyse the impact of a modification in your application, by telling you exactly which features you have to test before publishing a new version.
 
 
@@ -11,7 +12,7 @@ $ cd /var/www/html
 $ sudo git clone https://github.com/WustmannMatthias/PHP-Modeler
 ```
 
-Make your server owner of the /data directory of the project : 
+Fill informations about your neo4j database into the /data/general_settings/database file of the project, and then make your server owner of the /data directory of the project : 
 ```
 $ cd PHP-Modeler 
 $ sudo chown -R www-data:www-data data
