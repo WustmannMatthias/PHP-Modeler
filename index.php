@@ -37,9 +37,6 @@
 							else if (isset($_GET['new_project'])) {
 								include "frames/new_project.php"; 	
 							}
-							else if (isset($_GET['query_database'])) {
-								include "frames/query_database.php"; 	
-							}
 							else if (isset($_GET['project'])) {
 								include "frames/project_manager.php";
 							}

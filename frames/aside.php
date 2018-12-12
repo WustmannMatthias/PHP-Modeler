@@ -57,11 +57,12 @@
 		<a href="index.php?new_project">
 			<li class="list-group-item <?php if (isset($_GET['new_project'])) echo 'active'; ?>"> New project...</li>
 		</a>
-		<a href="index.php?query_database">
-			<li class="list-group-item <?php if (isset($_GET['query_database'])) echo 'active'; ?>">Query database</li>
 		</a>
 		<a href="index.php?features">
 			<li class="list-group-item <?php if (isset($_GET['features'])) echo 'active'; ?>">Get features to test</li>
+		</a>
+		<a href="http://localhost:7474/browser/" target="_blank">
+			<li class="list-group-item"> Manage database</li>
 		</a>
 		<?php echo $dynamicMenu; ?>
 
