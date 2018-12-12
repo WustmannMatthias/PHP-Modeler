@@ -9,12 +9,18 @@ Once modelled, PHP Modeler will allow you to have a better understanding of the 
 Clone the repository into your (apache) server directory : 
 ```console
 $ cd /var/www/html
-$ sudo git clone https://github.com/WustmannMatthias/PHP-Modeler
+$ sudo git clone https://github.com/WustmannMatthias/PHP-Modeller
+```
+
+Install dependencies : 
+```
+$ cd PHP-Modeller
+$ composer install
+
 ```
 
 Fill informations about your neo4j database into the /data/general_settings/database file of the project, and then make your server owner of the /data directory of the project : 
 ```
-$ cd PHP-Modeler 
 $ sudo chown -R www-data:www-data data
 ```
 
@@ -22,13 +28,13 @@ $ sudo chown -R www-data:www-data data
 
 To model an application, just clone her repository into the /data/projects directory of this application : 
 ```
-$ cd /var/www/html/PHP-Modeler/data/projects
+$ cd /var/www/html/PHP-Modeller/data/projects
 $ sudo git clone <your_project_url>
 ```
 
-Go to the user interface of PHP-Modeler simply by typing following URL in the URL field of your browser, 
+Go to the user interface of PHP-Modeller simply by typing following URL in the URL field of your browser, 
 ```
-localhost/PHP-Modeler
+localhost/PHP-Modeller
 ```
 and follow the instructions !
 
