@@ -16,7 +16,6 @@ Install dependencies :
 ```
 $ cd PHP-Modeller
 $ composer install
-
 ```
 
 Fill informations about your neo4j database into the /data/general_settings/database file of the project, and then make your server owner of the /data directory of the project : 

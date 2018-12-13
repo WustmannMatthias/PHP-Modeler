@@ -9,8 +9,8 @@
 	}
 
 
-	$settingsFile = "/var/www/html/PHP-Modeller/data/projects_settings/$project";
-	$projectDirectory = "/var/www/html/PHP-Modeller/data/projects/$project";
+	$settingsFile = __DIR__."/../data/projects_settings/$project";
+	$projectDirectory = __DIR__."/../data/projects/$project";
 
 	//Check if project is loadable
 	if (!is_dir($projectDirectory)) {
@@ -60,11 +60,13 @@
 		<div class="row form-group">
 			<label class="col-lg-6 control-label">Analyse files without extensions</label>
 			
-			<label class=" control-label"><input class="col-lg-1" type="radio" name="withoutExtension" required="required" value="TRUE"
-				<?php if ($settings['NO_EXTENSION_FILES']) echo "checked='checked'";?> />yes</label>
+			<label class="col-lg-1 control-label">yes</label>
+			<input class="col-lg-1" type="radio" name="withoutExtension" required="required" value="TRUE"
+				<?php if ($settings['NO_EXTENSION_FILES']) echo "checked='checked'";?> />
 			
-			<label class=" control-label"><input class="col-lg-1" type="radio" name="withoutExtension" required="required" value="FALSE"
-				<?php if (!$settings['NO_EXTENSION_FILES']) echo "checked='checked'";?> />no</label>
+			<label class="col-lg-1 control-label">no</label>
+			<input class="col-lg-1" type="radio" name="withoutExtension" required="required" value="FALSE"
+				<?php if (!$settings['NO_EXTENSION_FILES']) echo "checked='checked'";?> />
 		</div>
 
 		<div class="row form-group">
@@ -104,7 +106,7 @@
 	/**
 		NEW ITERATION
 	*/
-		$iterationFile = "/var/www/html/PHP-Modeller/data/general_settings/iteration";
+		$iterationFile = __DIR__."/../data/general_settings/iteration";
 
 		if (isset($_POST['registerIteration'])) {
 			$iterationSettings = "REPOSITORY=".$project."\n";
@@ -159,8 +161,8 @@
 
 
 <br><br><br>
-<div id="loading"></div>
-<pre id="result"></pre>
+<div id="loading" class="center-block"></div>
+<pre id="result" class="center-block"></pre>
 
 
 

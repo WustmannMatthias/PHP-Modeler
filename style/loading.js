@@ -1,7 +1,7 @@
 function loading(xhr) {
 	$('#loading').html(
-		"<p class='center'>Please wait for project to be analysed...</p><br>"
-		+ "<img class='center' src='images/Loading_icon.gif' alt='loading gif' />"
+		"<br><p class='center'>Please wait for project to be analysed...<br><br>"
+		+ "<img class='center' src='images/gears.gif' alt='loading gif' /></p>"
 	);
 	$('#loading').show();
 }

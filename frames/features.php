@@ -44,8 +44,8 @@
 			method="post" action="index.php?features">
 		
 		<div class="row form-group" id="project_select">
-			<label>Select your project </label>
-			<select name="project">
+			<label class="col-lg-3">Select your project </label>
+			<select class="col-lg-3" name="project">
 				<?php
 					echo $projectOptions;
 				?>
@@ -53,8 +53,8 @@
 		</div>
 
 		<div class="row form-group" id="iteration_select">
-			<label>Select the iteration</label>
-			<select name="iteration">
+			<label class="col-lg-3">Select the iteration</label>
+			<select class="col-lg-3" name="iteration">
 				<?php
 					//echo $iterationOptions;
 				?>

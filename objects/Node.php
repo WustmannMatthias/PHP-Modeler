@@ -161,8 +161,9 @@
 		*/
 		private function analyseFeatures($line) {
 			global $featureSyntax;
-			if (startsWith($line, $featureSyntax)) {
-				$feature = trim(str_replace($featureSyntax, '', $line));
+			$regex = "/(".$featureSyntax."){1}\s.*$/";
+			if (preg_match($regex, $line)) {
+				$feature = $this->extractFeature($line);
 				array_push($this->_features, $feature);
 			}
 		}
@@ -512,6 +513,27 @@
 		}
 
 
+		/**
+			Takes a line with a feature declaration and returns only the argument
+			@param line is a String
+			@return is a String
+		*/
+		private function extractFeature($line) {
+			global $featureSyntax;
+			
+			$beginPos = strpos($line, $featureSyntax);
+			if ($beginPos === FALSE) { // Should never happend
+				return FALSE;
+			}
+
+			$endPos = $beginPos + strlen($featureSyntax);
+
+			$feature = trim(substr($line, $endPos));
+			return $feature;
+		}
+
+
+
 		
 		/**
 			Takes a relative path, or a path containing some '.' or '..' in it,
@@ -705,7 +727,8 @@
 				$counter = 0;								
 				foreach ($this->_features as $feature) {
 					$counter ++;
-					$query.= "MERGE (f".$counter.":Feature {name: '$feature'}) ";
+					$query.= "MERGE (f".$counter.":Feature {name: '$feature', 
+									project: '".$this->_repoName."'}) ";
 					$query.= "CREATE (n)-[:".$featureRelation."]->(f".$counter.") ";
 				}
 			}

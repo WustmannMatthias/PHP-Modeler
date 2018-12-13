@@ -11,7 +11,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Application Modeling</title>
+		<title>PHP Modeller</title>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -28,7 +28,7 @@
 			<div class="row">
 				<!--MAIN SCREEN-->
 				<div class="col-lg-10 no_margin">
-					<div class="container">
+					<main class="container">
 						<?php 
 							if (isset($_GET['home']) 
 								|| $_SERVER['QUERY_STRING'] == "") {
@@ -47,7 +47,7 @@
 								echo "404 not found";
 							}
 						?>
-					</div>
+					</main>
 				</div>
 
 				<!--ASIDE MENU-->

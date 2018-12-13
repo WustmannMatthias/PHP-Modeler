@@ -77,9 +77,11 @@
 		<div class="row form-group">
 			<label class="col-lg-6 control-label">Analyse files without extensions</label>
 			
-			<label class=" control-label"><input class="col-lg-1" type="radio" name="withoutExtension" required="required" value="TRUE" />yes</label>
+			<label class="col-lg-1 control-label">yes</label>
+			<input class="col-lg-1" type="radio" name="withoutExtension" required="required" value="TRUE" />
 			
-			<label class=" control-label"><input class="col-lg-1" type="radio" name="withoutExtension" required="required" value="FALSE" />no</label>
+			<label class="col-lg-1 control-label">no</label>
+			<input class="col-lg-1" type="radio" name="withoutExtension" required="required" value="FALSE" />
 		</div>
 
 		<div class="row form-group">
@@ -113,7 +115,12 @@
 
 		$project = $_SESSION['project'];
 
-		$settingsFile = "/var/www/html/PHP-Modeller/data/projects_settings/$project";
+		$projectsSettingsDirectory = __DIR__."/../data/projects_settings";
+		if (!is_dir($projectsSettingsDirectory)) {
+			mkdir($projectsSettingsDirectory);
+		}
+
+		$settingsFile = "$projectsSettingsDirectory/$project";
 		
 		$settings = "";
 		if (isset($_POST['extensions'])) $settings.="EXTENSIONS=".$_POST['extensions']."\n";
@@ -158,5 +165,9 @@
 ?>
 
 <br><br><br>
-<div id="loading"></div>
-<pre id="result"></pre>
+<div class="row">
+	<div id="loading" class=""></div>
+</div>
+<div class="row">
+	<pre id="result" class="center-block"></pre>
+</div>

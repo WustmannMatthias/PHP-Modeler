@@ -55,6 +55,11 @@ h2.first_h2 {
 }
 
 
+input[type="text"], input[type="time"], input[type="date"], select {
+	border-radius: 4px;
+}
+
+
 
 
 
