@@ -27,8 +27,9 @@
 	$iterationSettings = parse_ini_file("data/general_settings/iteration", true, INI_SCANNER_NORMAL);
 
 	$project = $iterationSettings['REPOSITORY'];
-	$repository = "data/projects/$project";
+	$repository = realpath(__DIR__."/../data/projects/$project");
 	$repoName = getRepoName($repository);
+
 	$iterationName 	= $iterationSettings['ITERATION_NAME'];
 	
 	$iterationBegin = Date::buildDateFromAmericanFormat (	
@@ -58,7 +59,7 @@
 	$featureSyntax = $settings['FEATURE_SYNTAX'];
 
 	$subDirectoriesToIgnore = parseParameters($settings['SUB_DIRECTORIES']);
-	array_push($subDirectoriesToIgnore, '.', '..', '.git');
+	array_push($subDirectoriesToIgnore, '.git');
 	$subDirectoriesToIgnore = array_unique($subDirectoriesToIgnore);
 
 	$filesToIgnore = parseParameters($settings['FILES']);

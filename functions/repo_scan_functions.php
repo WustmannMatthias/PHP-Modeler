@@ -50,7 +50,7 @@
 		@param dir is the path to a directory to scan (String)
 		@param results is the array ot store the results in
 	*/
-	function getDirContent($dir, $subDirectoriesToIgnore=array('.', '..'), 
+	function getDirContent($repoPath, $dir, $subDirectoriesToIgnore=array('.', '..'), 
 							$filesToIgnore=array(), &$results=array()) {
 		if (!is_dir($dir)) { //is it a directory ?
 			throw new RepositoryScanException("$dir is not a directory");
@@ -62,16 +62,23 @@
 		$files = scandir($dir);
 
 		foreach ($files as $item) {
-			$path = realpath($dir.DIRECTORY_SEPARATOR.$item);
+			if (!in_array($item, array('.', '..'))) {
 
-			if (!is_dir($path)) {
-				if (!in_array($item, $filesToIgnore)) {
-					array_push($results, $path);
-				}
-			} 
-			else if (!in_array($item, $subDirectoriesToIgnore)) {
-				getDirContent($path, $subDirectoriesToIgnore,
-								$filesToIgnore, $results);
+				$path = realpath($dir.DIRECTORY_SEPARATOR.$item);
+
+				$pathFromRepo = substr($path, strlen($repoPath) + 1);
+
+				if (!is_dir($path)) {
+					if (!in_array($pathFromRepo, $filesToIgnore)) {
+						array_push($results, $path);
+					}
+				} 
+				else {
+					if (!in_array($pathFromRepo, $subDirectoriesToIgnore)) {
+						getDirContent($repoPath, $path, $subDirectoriesToIgnore,
+										$filesToIgnore, $results);
+					}
+				}	
 			}
 		}
 
@@ -112,8 +119,7 @@
 		@return is a String
 	*/
 	function getRepoName($path) {
-		$endPath = @end(explode("/", $path));
-		return str_replace(".git", "", $endPath);
+		return @end(explode("/", $path));
 	}
 
 

@@ -40,7 +40,7 @@
 	//Get array of every file in repo
 	$timestamp_directory = microtime(TRUE);
 	try {
-		$files = getDirContent($repository, $subDirectoriesToIgnore, $filesToIgnore);
+		$files = getDirContent($repository, $repository, $subDirectoriesToIgnore, $filesToIgnore);
 		$files = keepSpecificTypesOnly($files, $extensions, $noExtensionFiles);
 	}
 	catch (RepositoryScanException $e) {
@@ -125,6 +125,7 @@
 	Node::setOldFileList($filesInDB);
 	///displayArray(Node::getOldFileList());
 	$timestamp_database = microtime(TRUE) - $timestamp_database;
+
 
 
 
