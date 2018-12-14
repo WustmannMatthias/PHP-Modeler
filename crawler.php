@@ -26,7 +26,9 @@
 	
 
 	//Get user settings
+	$timestamp_parse_settings = microtime(TRUE);
 	require_once "programs/parse_settings.php";
+	$timestamp_parse_settings = microtime(TRUE) - $timestamp_parse_settings;
 
 
 
@@ -304,6 +306,8 @@
 	$timestamp_full = microtime(TRUE) - $timestamp_full;
 
 	echo "############### PERFORMANCES ###############<br><br>";
+	echo "Time to parse settings : "
+		.number_format($timestamp_parse_settings, 4)."s<br>";
 	echo "Time to load repository : "
 		.number_format($timestamp_directory, 4)."s<br>";
 	echo "Time to prepare database : "

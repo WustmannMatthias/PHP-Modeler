@@ -185,7 +185,7 @@
 				if ($subLine = $this->isRelPathInLine($line)) {
 					$line = $this->replaceRelPath($line, $subLine);
 				}
-				if ($this->isVariableInLine($line)) {
+				if ($this->isVariableInLine($matches[0])) {
 					$line = $this->replaceVariables($line, $lineCount);
 				}
 				if ($this->isMagicConstantInLine($line)) {
@@ -304,7 +304,7 @@
 			@param line is the line to analyse
 			@return is the found pattern, or false
 		*/
-		public function isRelPathInLine($line) {
+		private function isRelPathInLine($line) {
 			$regex = '/\$_SERVER\s*\[\s*[\\]?[\"\']REL_PATH[\\]?[\"\']\s*\]/';
 			if (preg_match($regex, $line, $result)) {
 				return $result[0];
@@ -370,6 +370,7 @@
 			while (!feof($fileHandler)) {
 				$line = fgets($fileHandler);
 				$lineCount ++;
+
 				foreach ($variableNames as $variableName) {
 					if (startsWith(trim($line), $variableName)) {
 						$declarationLines[$variableName] = $line;
@@ -426,11 +427,9 @@
 			@return is also a String
 		*/
 		private function replaceMagicConstant($line) {
-			//echo $line;
 			$dirPath = str_replace($this->_name, "", $this->_path);
 			$newLine = str_replace("__DIR__", '"'.$dirPath.'"', $line);
-			
-			//echo "\n".$newline."\n";
+
 			return $newLine;
 		}
 
@@ -486,7 +485,7 @@
 					$output.= $character;
 				}
 			}
-			//echo $output."\n";
+
 			return $output;
 		}
 
