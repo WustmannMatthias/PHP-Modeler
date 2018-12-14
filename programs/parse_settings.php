@@ -24,7 +24,7 @@
 
 	/******************* PARSE ITERATION FILE *********************/
 
-	$iterationSettings = parse_ini_file("data/general_settings/iteration", true, INI_SCANNER_NORMAL);
+	$iterationSettings = parse_ini_file(__DIR__."/../data/general_settings/iteration", true, INI_SCANNER_NORMAL);
 
 	$project = $iterationSettings['REPOSITORY'];
 	$repository = realpath(__DIR__."/../data/projects/$project");

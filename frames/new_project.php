@@ -26,7 +26,7 @@
 			if (isset($_POST['project'])) {
 				$project = $_POST['project'];
 
-				if (!is_dir("/var/www/html/PHP-Modeller/data/projects/$project")) {
+				if (!is_dir(__DIR__."/../data/projects/$project")) {
 					echo "<div class='row'>
 							<div class='col-lg-8 col-lg-offset-4 alert alert-warning'>No directory with the given name was found in data/projects. Make sure to clone the repository before continuing.</div>
 						</div>";
@@ -136,7 +136,7 @@
 		/**
 			CREATE FIRST ITERATION CONFIG FILE
 		*/
-		$iterationFile = "/var/www/html/PHP-Modeller/data/general_settings/iteration";
+		$iterationFile = __DIR__."/../data/general_settings/iteration";
 
 		$iterationSettings = "REPOSITORY=$project\n";
 		$iterationSettings.= "ITERATION_NAME=initialisation\n";
