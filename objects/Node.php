@@ -305,6 +305,7 @@
 			@return is the found pattern, or false
 		*/
 		private function isRelPathInLine($line) {
+
 			$regex = '/\$_SERVER\s*\[\s*[\\]?[\"\']REL_PATH[\\]?[\"\']\s*\]/';
 			if (preg_match($regex, $line, $result)) {
 				return $result[0];
@@ -459,7 +460,7 @@
 			$repoPos = strpos($this->_path, $this->_repoName);
 			$upToRepo = substr($this->_path, 0, $repoPos);
 			$relPath = $upToRepo.$this->_repoName.'/';
-			return str_replace($subLine, $relPath, $line);
+			return str_replace($subLine, '"'.$relPath.'"', $line);
 		}
 
 
