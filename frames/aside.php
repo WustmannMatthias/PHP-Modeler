@@ -61,7 +61,7 @@
 		<a href="index.php?features">
 			<li class="list-group-item <?php if (isset($_GET['features'])) echo 'active'; ?>">Get features to test</li>
 		</a>
-		<a href="http://localhost:7474/browser/" target="_blank">
+		<a href="http://<?php echo $_SERVER['SERVER_ADDR'] ?>:7474/browser/" target="_blank">
 			<li class="list-group-item"> Manage database</li>
 		</a>
 		<?php echo $dynamicMenu; ?>
