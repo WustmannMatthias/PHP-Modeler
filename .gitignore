@@ -1,12 +1,14 @@
 /TODO
 /subject.odt
 
-/iteration
-
 /vendor/
 /composer.lock
 
-/data/projects/*
-/data/projects_settings/*
+/data/projects/
+/data/projects_settings/
 
 !/data/projects/README.md
+
+/report/
+
+/test.php

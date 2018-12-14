@@ -47,10 +47,20 @@
 
 	/**
 		new recursive function to scan the directory, much more efficient.
-		@param dir is the path to a directory to scan (String)
-		@param results is the array ot store the results in
+		@param repoPath is the path to the directory to scan
+		@param dir is the path to a directory to scan (String), like repoPath, 
+			but this parameter will change every time the function calls itself, and become the current subdirectory to scan
+		@param subDirectoriesToIgnore is an array of directories that won't be scanned.
+			Path has to be given from the repository.
+			Example : if the repository is Pricer and you want to ignore the directory 
+			/var/www/html/Pricer/programs/ignore : then you should precise 
+			programs/ignore.
+		@param filesToIgnore is an array of files to ignore. Same rule as for the 
+			directories
+		@param results (reference) is the array ot store the results in. the results 
+			are absolute paths
 	*/
-	function getDirContent($repoPath, $dir, $subDirectoriesToIgnore=array('.', '..'), 
+	function getDirContent($repoPath, $dir, $subDirectoriesToIgnore=array(), 
 							$filesToIgnore=array(), &$results=array()) {
 		if (!is_dir($dir)) { //is it a directory ?
 			throw new RepositoryScanException("$dir is not a directory");

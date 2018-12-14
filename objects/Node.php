@@ -180,8 +180,11 @@
 		private function analyseFileInclusions($line, $lineCount) { 
 			$matches = array();
 			$regex = "/((require)|(include)){1}(_once)?\s+[-_ A-Za-z0-9\$\.\"'\/\s\[\]]+;/";
-
 			if (preg_match($regex, $line, $matches)) { 
+
+				if ($subLine = $this->isRelPathInLine($line)) {
+					$line = $this->replaceRelPath($line, $subLine);
+				}
 				if ($this->isVariableInLine($line)) {
 					$line = $this->replaceVariables($line, $lineCount);
 				}
@@ -283,12 +286,28 @@
 			dirname(__FILE__)
 			return it if found
 			@param $line (string) is the line to analyse
-			@return is the found pattern
+			@return is the found pattern, or false
 		*/
 		private function isShittyConstantInLine($line) {
 			$regex = "/dirname\s*\(\s*__FILE__\s*\)/";
 			if (preg_match($regex, $line, $result)) {
 				return $result;
+			}
+			return FALSE;
+		}
+
+
+
+		/**
+			Check if the pattern $_SERVER['REL_PATH'] is used in a code line, 
+			and return it if found
+			@param line is the line to analyse
+			@return is the found pattern, or false
+		*/
+		public function isRelPathInLine($line) {
+			$regex = '/\$_SERVER\s*\[\s*[\\]?[\"\']REL_PATH[\\]?[\"\']\s*\]/';
+			if (preg_match($regex, $line, $result)) {
+				return $result[0];
 			}
 			return FALSE;
 		}
@@ -429,6 +448,22 @@
 			return $newLine;
 		}
 
+
+
+		/**
+			Replace the pattern $_SERVER['REL_PATH'] by the corresponding path
+			@param line containing the pattern (String)
+			@param subLine is the exact pattern (String)
+			@return is the new Line (String)
+		*/
+		private function replaceRelPath($line, $subLine) {
+			$repoPos = strpos($this->_path, $this->_repoName);
+			$upToRepo = substr($this->_path, 0, $repoPos);
+			$relPath = $upToRepo.$this->_repoName.'/';
+			return str_replace($subLine, $relPath, $line);
+		}
+
+
 		/**
 			Help function : removes everything that is not a part of the path to a file
 			@param line (string) is the line of the file where a file is included
@@ -491,6 +526,7 @@
 			}
 			return $namespace;
 		}
+
 
 		/**
 			Takes a line with a use statement and returns only the argument
