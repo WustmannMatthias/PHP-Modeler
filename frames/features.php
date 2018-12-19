@@ -89,7 +89,7 @@
 
 		$query = "MATCH (p:Project {name: '$project'}) 
 					MATCH (i:Iteration {name: '$iteration'})-[:IS_ITERATION_OF]->(p)
-					MATCH (i)<-[:BELONGS_TO]-(files)-[:IS_INCLUDED_IN|:IS_REQUIRED_IN|:IS_USED_BY|:IMPACTS|:DECLARES*0..]->(feature:Feature)
+					MATCH (i)<-[:BELONGS_TO]-(files)-[:IS_INCLUDED_IN|:IS_REQUIRED_IN|:IS_USED_BY|:IMPACTS|:DECLARES*0..]->(feature:Feature {project: '$project'})
 					WITH feature
 					ORDER BY feature.name ASC 
 					RETURN DISTINCT feature.name AS feature";

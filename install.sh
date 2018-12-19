@@ -64,10 +64,10 @@ echo -e "\nDone.\n\n\n"
 
 
 #Managing rights
+user=`whoami`
+
 echo -e "Assigning rights to configuration files...\n"
-echo -e "Needs superuser rights for this step : "
-sudo chown -R www-data:www-data data/projects_settings
-sudo chown www-data:www-data data/general_settings/iteration
+sudo chown -R www-data:www-data data
 
 
 

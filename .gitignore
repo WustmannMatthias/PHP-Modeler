@@ -2,13 +2,7 @@
 /subject.odt
 
 /vendor/
-/composer.lock
 
-/data/projects/
-/data/projects_settings/
-
-!/data/projects/README.md
-
-/report/
+/data/
 
 /test.php

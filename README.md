@@ -14,10 +14,10 @@ $ sudo git clone https://github.com/WustmannMatthias/PHP-Modeller
 
 
 
-Install PHP-Modeller by launching the install script (you will be prompt for your superuser password) :  
+Install PHP-Modeller by launching the install script as a superuser : 
 ```
 $ chmod +x install.sh
-$ ./install.sh
+$ sudo ./install.sh
 ```
 
 
