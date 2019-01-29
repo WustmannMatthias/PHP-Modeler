@@ -117,7 +117,7 @@
 	// Already get array from files with their modification date in last modelisation 
 	// to win time later
 	$filesInDB = array();
-	$result = runQuery($client, "MATCH (n:File) RETURN n.path as path, 
+	$result = runQuery($client, "MATCH (n:File {repository: '$repoName'}) RETURN n.path as path, 
 						n.last_modified as last_modified");
 	foreach ($result->records() as $record) {
 		$path = $record->value('path');
@@ -300,6 +300,60 @@
 
 	/*******************************************************************************
 	********************************************************************************
+	***************** ADD * ITERATION * NODE * IN * DATABASE ***********************
+	********************************************************************************
+	*******************************************************************************/
+	/**
+		STEP 4 : Parse composer.lock and add services in Database
+	*/
+	echo "############### STEP 4 ADD SERVICES ###############<br><br>";
+	$timestamp_services = microtime(TRUE);
+	
+	try {
+		$composerLock = $repository.'/composer.lock';
+		if (!file_exists($composerLock)) {
+			throw new FileNotFoundException($composerLock);
+		}
+		$content = file_get_contents($composerLock);
+		$json = json_decode($content);
+
+		foreach ($json->packages as $package) {
+			$serviceName = $package->name;
+			$serviceVersion = $package->version;
+			$serviceUrl = $package->source->url;
+
+
+			$query = "	MATCH (p:Project {name: '$repoName'})
+						MERGE (s:Service {
+							name: '$serviceName', 
+							url:  '$serviceUrl'
+						})
+						CREATE UNIQUE (p)-[:DEPENDS_ON {
+							version: '$serviceVersion'
+						}]->(s)
+					 ";
+
+			runQuery($client, $query);
+		}
+
+
+	}
+	catch (FileNotFoundException $e) {
+		print("Couldn't parse composer.lock : file doesn't exist.");
+	}
+
+	echo "<br><br><br>Done.<br><br>";
+	$timestamp_services = microtime(TRUE) - $timestamp_services;
+
+
+
+
+
+
+
+
+	/*******************************************************************************
+	********************************************************************************
 	*************************** DISPLAY * PERFORMANCES *****************************
 	********************************************************************************
 	*******************************************************************************/
@@ -318,6 +372,8 @@
 		.number_format($timestamp_dependencies, 4)."s<br>";
 	echo "Time to add iteration : "
 		.number_format($timestamp_iteration, 4)."s<br>";
+	echo "Time to add services : "
+		.number_format($timestamp_services, 4)."s<br>";
 	echo "Script full running time : ".number_format($timestamp_full, 4)."s<br>";
 	
 	echo "<br><br><br>Exit.<br><br>";
