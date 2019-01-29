@@ -1,6 +1,6 @@
 
 <div class="row">
-	<h1 class="center">PHP Modeler</h1>
+	<h1 class="center">PHP Modeller</h1>
 </div>
 
 <div class="row">
