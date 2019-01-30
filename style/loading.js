@@ -29,7 +29,7 @@ function ajaxFailed(jqXHR, textStatus, errorThrown) {
 */
 $(function() {
 	$.ajax({
-		url: "crawler.php",
+		url: "programs/crawl_project.php",
 		beforeSend: loading
 	})	.done(printData)
 		.fail(ajaxFailed);

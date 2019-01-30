@@ -5,6 +5,8 @@
 		§§ Query generation 
 	*/
 	
+	require_once __DIR__.'/Dependency.php';
+
 
 
 	Class Node {

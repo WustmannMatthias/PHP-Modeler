@@ -4,7 +4,7 @@
 		§§ Require dependency storage
 	*/
 
-	require_once "functions/common_functions.php";
+	require_once __DIR__."/../functions/common_functions.php";
 
 	class Dependency {
 

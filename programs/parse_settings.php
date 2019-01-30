@@ -2,7 +2,7 @@
 	/**
 		§§ Parse Settings
 	*/
-	require_once 'functions/common_functions.php';
+	require_once __DIR__.'/../functions/common_functions.php';
 
 	/**
 		Just separate multiple parameters and returns an array with all trimed parameters
@@ -49,7 +49,7 @@
 
 	/******************* PARSE PROJECT SETTINGS FILE *********************/
 
-	$settings = parse_ini_file("data/projects_settings/$project", true, 
+	$settings = parse_ini_file(__DIR__."/../data/projects_settings/$project", true, 
 								INI_SCANNER_NORMAL);
 	
 	$extensions = parseParameters($settings['EXTENSIONS']);
@@ -71,7 +71,7 @@
 	/******************* PARSE DATABASE SETTINGS FILE *********************/
 	unset($settings);
 	
-	$settings = parse_ini_file("data/general_settings/database", true, 
+	$settings = parse_ini_file(__DIR__."/../data/general_settings/database", true, 
 								INI_SCANNER_NORMAL);
 	$databaseURL = $settings['DATABASE_URL'];
 	$databasePort = $settings['DATABASE_PORT'];
