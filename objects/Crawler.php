@@ -22,7 +22,6 @@
 	 */
 	class Crawler {
 
-		private $_project;
 		private $_repository;
 		private $_repoName;
 		private $_iterationName;
@@ -38,10 +37,9 @@
 		private $_username;
 		private $_password;
 		
-		public function __construct($project, $repository, $repoName, $iterationName, $iterationBegin, $iterationEnd, $extensions, $noExtensionFiles, $featureSyntax, 
+		public function __construct($repository, $repoName, $iterationName, $iterationBegin, $iterationEnd, $extensions, $noExtensionFiles, $featureSyntax, 
 									$subDirectoriesToIgnore, $filesToIgnore, $databaseURL, $databasePort, $username, $password) {
 
-			$this->_project = $project;
 			$this->_repository = $repository;
 			$this->_repoName = $repoName;
 			$this->_iterationName = $iterationName;
@@ -62,7 +60,6 @@
 
 
 		public function crawl() {
-			$project = $this->_project;
 			$repository = $this->_repository;
 			$repoName = $this->_repoName;
 			$iterationName = $this->_iterationName;
@@ -85,7 +82,11 @@
 			**************************** REPOSITORY * SCANNING *****************************
 			********************************************************************************
 			*******************************************************************************/
-			
+			echo "*************************************************";
+			echo "\n         REPOSITORY : ".$repoName."\n";
+			echo "*************************************************\n\n";
+			//echo $this->toString()."\n\n";
+
 			//Get array of every file in repo
 			$timestamp_directory = microtime(TRUE);
 			try {
@@ -94,15 +95,14 @@
 			}
 			catch (RepositoryScanException $e) {
 				echo $e->getMessage();
-				echo "<br>";
-				echo "Can't scan repository. Program end.<br>";
+				echo "\n";
+				echo "Can't scan repository. Program end.\n";
 				exit();
 			}
 			
 			$repoName = getRepoName($repository);
 			$timestamp_directory = microtime(TRUE) - $timestamp_directory;
 			
-
 
 
 
@@ -192,9 +192,9 @@
 				After this first step, every file, namespace, and feature will be represented
 				in the modeling. However, links between files won't be.
 			*/
-			echo "############### STEP 1 ANALYSE ###############<br>";
+			echo "############### STEP 1 ANALYSE ###############\n";
 			echo "Files to analyse : ".sizeof($files);
-			echo "<br><br>";
+			echo "\n\n";
 
 
 			$timestamp_analyse = microtime(TRUE);
@@ -252,7 +252,7 @@
 
 			}
 
-			echo "<br><br><br>Done.<br><br>";
+			echo "\n\n\nDone.\n\n";
 			$timestamp_analyse = microtime(TRUE) - $timestamp_analyse;
 
 
@@ -268,7 +268,7 @@
 			/**
 				STEP 2 : Read informations stored in every node, send relations in database.
 			*/
-			echo "############### STEP 2 UPLOAD DEPENDENCIES ###############<br><br>";
+			echo "############### STEP 2 UPLOAD DEPENDENCIES ###############\n\n";
 			$timestamp_dependencies = microtime(TRUE);
 			foreach ($nodes as $node) {
 				try {
@@ -288,7 +288,7 @@
 					printQueriesGenerationExceptionMessage($e, $node->getPath());
 				}
 			}
-			echo "<br><br><br>Done.<br><br>";
+			echo "\n\n\nDone.\n\n";
 			$timestamp_dependencies = microtime(TRUE) - $timestamp_dependencies;
 
 
@@ -307,36 +307,42 @@
 			/**
 				STEP 3 : Add iterations in database
 			*/
-			echo "############### STEP 3 ADD ITERATION ###############<br><br>";
+			echo "############### STEP 3 ADD ITERATION ###############\n\n";
 			$timestamp_iteration = microtime(TRUE);
 			
 			// Just prepare variables
 			$begin 	= $iterationBegin->getTimestamp();
 			$end 	= $iterationEnd->getTimestamp();
 			$repoName = $nodes[0]->getRepoName(); // All nodes belongs to the same repo
-			
+			$atLeastOne = FALSE;
 
-			runQuery($client, "MERGE (i:Iteration {name: '$iterationName', 
-														begin: $begin, 
-														end: $end })");
 			foreach ($nodes as $node) {
 				if ($node->getLastModified()->isBetween($iterationBegin, $iterationEnd)) {
 					$atLeastOne = TRUE;
 					$path = Node::getPathFromRepo($node->getPath(), $node->getRepoName());
 
 					$query = "MATCH  (f:File {path: '".$path."'})
-							  MATCH  (i:Iteration {name: '$iterationName',
-							  					   begin: $begin,
-							  					   end: $end }) 
 							  MERGE  (p:Project {name: '$repoName'})
-							  MERGE  (i)-[:IS_ITERATION_OF]->(p)
+							  MERGE  (i:Iteration {name: '$iterationName'})-[:IS_ITERATION_OF]->(p)
+							  SET 	 i.begin = $begin,
+							  		 i.end = $end
+							  
 							  MERGE (f)-[:BELONGS_TO]->(i) ";
-					//echo $query."<br><br>";
+					//echo $query."\n\n";
 					runQuery($client, $query);
 				}
 			}
 
-			echo "<br><br><br>Done.<br><br>";
+
+			if (!$atLeastOne) {
+				runQuery($client, "MERGE (p:Project {name: '$repoName'})
+									CREATE (i:Iteration {name: '$iterationName', begin: $begin, end: $end})
+									-[:IS_ITERATION_OF]->(p)"
+						);
+			}
+
+
+			echo "\n\n\nDone.\n\n";
 			$timestamp_iteration = microtime(TRUE) - $timestamp_iteration;
 
 
@@ -347,13 +353,13 @@
 
 			/*******************************************************************************
 			********************************************************************************
-			***************** ADD * ITERATION * NODE * IN * DATABASE ***********************
+			********************* ADD * SERVICES * IN * DATABASE ***************************
 			********************************************************************************
 			*******************************************************************************/
 			/**
 				STEP 4 : Parse composer.lock and add services in Database
 			*/
-			echo "############### STEP 4 ADD SERVICES ###############<br><br>";
+			echo "############### STEP 4 ADD SERVICES ###############\n\n";
 			$timestamp_services = microtime(TRUE);
 			
 			try {
@@ -389,7 +395,7 @@
 				print("Couldn't parse composer.lock : file doesn't exist.");
 			}
 
-			echo "<br><br><br>Done.<br><br>";
+			echo "\n\n\nDone.\n\n";
 			$timestamp_services = microtime(TRUE) - $timestamp_services;
 
 
@@ -405,22 +411,52 @@
 			********************************************************************************
 			*******************************************************************************/
 			
-			echo "############### PERFORMANCES ###############<br><br>";
+			echo "############### PERFORMANCES ###############\n\n";
 			echo "Time to load repository : "
-				.number_format($timestamp_directory, 4)."s<br>";
+				.number_format($timestamp_directory, 4)."s\n";
 			echo "Time to prepare database : "
-				.number_format($timestamp_database, 4)."s<br>";
+				.number_format($timestamp_database, 4)."s\n";
 			echo "Time to analyse repository : " 
-				.number_format($timestamp_analyse, 4)."s<br>";
+				.number_format($timestamp_analyse, 4)."s\n";
 			echo "Time to upload dependencies : "
-				.number_format($timestamp_dependencies, 4)."s<br>";
+				.number_format($timestamp_dependencies, 4)."s\n";
 			echo "Time to add iteration : "
-				.number_format($timestamp_iteration, 4)."s<br>";
+				.number_format($timestamp_iteration, 4)."s\n";
 			echo "Time to add services : "
-				.number_format($timestamp_services, 4)."s<br>";
+				.number_format($timestamp_services, 4)."s\n";
 
-			echo "<br><br><br>Exit.<br><br>";
+		}
 
+
+
+		public function toString() {
+			return
+			"repository = ".$this->_repository."\n".
+			"repoName = ".$this->_repoName."\n".
+			"iterationName = ".$this->_iterationName."\n".
+			"iterationBegin = ".$this->_iterationBegin->toString()."\n".
+			"iterationEnd = ".$this->_iterationEnd->toString()."\n".
+			"extensions = ".$this->arrayToString($this->_extensions)."\n".
+			"noExtensionFiles = ".$this->_noExtensionFiles."\n".
+			"featureSyntax = ".$this->_featureSyntax."\n".
+			"subDirectoriesToIgnore = ".$this->arrayToString($this->_subDirectoriesToIgnore)."\n".
+			"filesToIgnore = ".$this->arrayToString($this->_filesToIgnore)."\n".
+			"databaseURL = ".$this->_databaseURL."\n".
+			"databasePort = ".$this->_databasePort."\n".
+			"username = ".$this->_username."\n".
+			"password = ".$this->_password."\n";
+		}
+
+		private function arrayToString($arr) {
+			$output = "[";
+			foreach ($arr as $key => $value) {
+				$output.= "$key => $value , ";
+			}
+			if ($output != "[") {
+				$output = substr($output, 0, strlen($output) - 3);
+			}
+			$output .= "]";
+			return $output;
 		}
 
 	}

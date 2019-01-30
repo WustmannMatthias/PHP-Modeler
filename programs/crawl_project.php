@@ -23,7 +23,7 @@
 
 
 
-	$crawler = new Crawler($project, $repository, $repoName, $iterationName, $iterationBegin, $iterationEnd, $extensions, $noExtensionFiles, $featureSyntax, 
+	$crawler = new Crawler($repository, $repoName, $iterationName, $iterationBegin, $iterationEnd, $extensions, $noExtensionFiles, $featureSyntax, 
 							$subDirectoriesToIgnore, $filesToIgnore, $databaseURL, $databasePort, $username, $password);
 	$crawler->crawl();
 

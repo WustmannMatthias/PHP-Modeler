@@ -10,10 +10,10 @@
 		@return is a String
 	*/
 	function printAnalysisExceptionMessage($e, $filePath) {
-		$output = $filePath." analysis has thrown : <br>";
+		$output = $filePath." analysis has thrown : \n";
 		$class 	= get_class($e);
-		$output.= "<b>$class</b> found in ".$e->getFile()." line ".$e->getLine()."<br>";
-		$output.= "==> ".$e->getMessage()."<br><br>";
+		$output.= "<b>$class</b> found in ".$e->getFile()." line ".$e->getLine()."\n";
+		$output.= "==> ".$e->getMessage()."\n\n";
 		echo $output;
 	}
 
@@ -26,10 +26,10 @@
 		@return is a String
 	*/
 	function printQueriesGenerationExceptionMessage($e, $filePath) {
-		$output = $filePath." queries generation has thrown : <br>";
+		$output = $filePath." queries generation has thrown : \n";
 		$class 	= get_class($e);
-		$output.= "<b>$class</b> found in ".$e->getFile()." line ".$e->getLine()."<br>";
-		$output.= "==> ".$e->getMessage()."<br><br>";
+		$output.= "<b>$class</b> found in ".$e->getFile()." line ".$e->getLine()."\n";
+		$output.= "==> ".$e->getMessage()."\n\n";
 		echo $output;
 	}
 
@@ -41,10 +41,10 @@
 		@return is a String
 	*/
 	function printDatabaseExceptionMessage($e) {
-		$output = "neo4j API exception : <br>";
+		$output = "neo4j API exception : \n";
 		$class 	= get_class($e);
 		$output.= "<b>$class</b> : ".
-		$output.="==> ".$e->getMessage()."<br><br>";
+		$output.="==> ".$e->getMessage()."\n\n";
 		echo $output;
 	}
 
