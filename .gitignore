@@ -4,5 +4,6 @@
 /vendor/
 
 /data/
+/logs/
 
 /test.php
