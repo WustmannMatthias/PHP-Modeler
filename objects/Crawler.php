@@ -145,8 +145,10 @@
 								(repoFiles)<-[repoUses:IS_USED_BY]-(:Namespace)
 								DELETE repoUses");
 
+			//NS from vendor are have no relation DECLARE in db
 			runQuery($client, "MATCH (repoFiles:File {repository: '$repoName'}),
 								(repoNS:Namespace)<-[repoNSDeclarations:DECLARES]-(repoFiles)
+								WHERE repoNS.repository = '$repoName'
 								DELETE repoNSDeclarations, repoNS");
 
 			runQuery($client, "MATCH (repoFiles:File {repository: '$repoName'}),
@@ -311,14 +313,14 @@
 			$timestamp_iteration = microtime(TRUE);
 
 			if (count($nodes) > 0) {
-
+				echo "IN ITERATION CONDITION\n";
 				// Just prepare variables
 				$begin 	= $iterationBegin->getTimestamp();
 				$end 	= $iterationEnd->getTimestamp();
 				$repoName = $nodes[0]->getRepoName(); // All nodes belongs to the same repo
 				$atLeastOne = FALSE;
 
-				$query = "MATCH  (f:File )
+				$query = "MATCH  (f:File)
 						  WHERE  f.repository = '$repoName'
 						  AND 	 f.last_modified < $end
 						  AND 	 f.last_modified > $begin
@@ -329,6 +331,7 @@
 						  		 i.end = $end
 						  
 						  MERGE (f)-[:BELONGS_TO]->(i) ";
+						  
 				//echo $query."\n\n";
 				runQuery($client, $query);
 			}
@@ -384,7 +387,7 @@
 			}
 			catch (FileNotFoundException $e) {
 				print("Couldn't parse composer.lock : file doesn't exist.");
-				file_put_contents(__DIR__.'/../logs/no_composer', $repoName." \n", FILE_APPEND | LOCK_EX);
+				file_put_contents('/home/wustmann/Bureau/no_composer', $repoName." \n", FILE_APPEND | LOCK_EX); //TEMPORARY
 			}
 
 			echo "\n\n\nDone.\n\n";

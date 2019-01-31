@@ -41,9 +41,15 @@ fi
 
 cd ..
 
+
 if [ ! -d logs ]
 then
 	mkdir logs
+fi
+
+if [ ! -f logs/no_composer ]
+then
+	touch logs/no_composer
 fi
 
 echo -e "\nDone.\n\n\n"

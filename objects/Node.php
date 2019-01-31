@@ -783,6 +783,9 @@
 				if ($this->_inVendor) {
 					$query.= ", inVendor: ".boolval(TRUE);
 				}
+				else {
+					$query.= ", repository: '".$this->_repoName."'";
+				}
 				$query.= "}) ";
 
 				if (!$this->_inVendor) {
@@ -865,7 +868,9 @@
 
 				$classNamesInString = $this->prepareClassNames($classNames);
 
-				$queryBegin	.= "MERGE (n".$counter.":Namespace {name: '$namespace'}) ";
+				$queryBegin	.= "MATCH (n".$counter.":Namespace)
+								WHERE n".$counter.".name = '$namespace'
+							 	AND (n".$counter.".repository = 'repository' OR exists(n".$counter.".inVendor))";
 				$queryEnd	.= "CREATE (n".$counter.")-[:$useRelation {class: 
 								$classNamesInString}]->(f) ";
 			}
