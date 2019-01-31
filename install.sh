@@ -41,6 +41,11 @@ fi
 
 cd ..
 
+if [ ! -d logs ]
+then
+	mkdir logs
+fi
+
 echo -e "\nDone.\n\n\n"
 
 
@@ -70,6 +75,7 @@ user=`whoami`
 
 echo -e "Assigning rights to configuration files...\n"
 sudo chown -R www-data:www-data data
+sudo chown -R www-data:www-data logs
 cd data
 sudo chown -R "$user:$user" projects
 

@@ -4,11 +4,18 @@
 	$timestamp_full = microtime(TRUE);
 
 
+
+
+	require_once __DIR__.'/../objects/Crawler.php';
+	require_once __DIR__.'/../objects/Date.php';
+	require_once __DIR__.'/../functions/common_functions.php';
+
 	require __DIR__.'/../vendor/autoload.php';
 
 	use GuzzleHttp\Client;
 
 	$client = new Client(['base_uri' => 'https://api.github.com']);
+
 
 	//header : Accept: application/vnd.github.v3+json
 
@@ -83,37 +90,26 @@
 
 
 
-	/**
-	 *	Once we got the ssh urls, let's clone every repo and install dependencies
-	 */
-
+	
 	chdir(__DIR__."/../data/projects");
 	foreach ($sshUrls as $name => $url) {
+		/**
+		 *	Once we got the ssh urls, let's clone every repo and install dependencies
+		 */
+
 		passthru('git clone '.$url, $output);
-		
+		/*
 		if (in_array('composer.json', scandir($name))) {
 			chdir($name);
 			passthru('composer install');
 			chdir('..');
 		}
-		
-	}
+		*/
 
-	echo "\n\n\n";
-	
+		/**
+		 *	Then, call the crawler for every repo to initialise the full database
+		 */
 
-
-	/**
-	 *	Then, call the crawler for every repo to initialise the full database
-	 */
-
-	require_once __DIR__.'/../objects/Crawler.php';
-	require_once __DIR__.'/../objects/Date.php';
-	require_once __DIR__.'/../functions/common_functions.php';
-	
-
-	foreach ($sshUrls as $name => $url) {
-		
 		$project = $name;
 		$repository = realpath(__DIR__."/../data/projects/$project");
 		$repoName = getRepoName($repository);
@@ -139,10 +135,12 @@
 
 		$crawler->crawl();
 		echo "\n\n\n\n\n\n";
-
+		
 	}
 
+	echo "\n\n\n";
 	
+	echo "Program successfully cmopleted.\n";
 
 
 

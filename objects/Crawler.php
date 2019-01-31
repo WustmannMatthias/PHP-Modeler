@@ -309,38 +309,29 @@
 			*/
 			echo "############### STEP 3 ADD ITERATION ###############\n\n";
 			$timestamp_iteration = microtime(TRUE);
-			
-			// Just prepare variables
-			$begin 	= $iterationBegin->getTimestamp();
-			$end 	= $iterationEnd->getTimestamp();
-			$repoName = $nodes[0]->getRepoName(); // All nodes belongs to the same repo
-			$atLeastOne = FALSE;
 
-			foreach ($nodes as $node) {
-				if ($node->getLastModified()->isBetween($iterationBegin, $iterationEnd)) {
-					$atLeastOne = TRUE;
-					$path = Node::getPathFromRepo($node->getPath(), $node->getRepoName());
+			if (count($nodes) > 0) {
 
-					$query = "MATCH  (f:File {path: '".$path."'})
-							  MERGE  (p:Project {name: '$repoName'})
-							  MERGE  (i:Iteration {name: '$iterationName'})-[:IS_ITERATION_OF]->(p)
-							  SET 	 i.begin = $begin,
-							  		 i.end = $end
-							  
-							  MERGE (f)-[:BELONGS_TO]->(i) ";
-					//echo $query."\n\n";
-					runQuery($client, $query);
-				}
+				// Just prepare variables
+				$begin 	= $iterationBegin->getTimestamp();
+				$end 	= $iterationEnd->getTimestamp();
+				$repoName = $nodes[0]->getRepoName(); // All nodes belongs to the same repo
+				$atLeastOne = FALSE;
+
+				$query = "MATCH  (f:File )
+						  WHERE  f.repository = '$repoName'
+						  AND 	 f.last_modified < $end
+						  AND 	 f.last_modified > $begin
+
+						  MERGE  (p:Project {name: '$repoName'})
+						  MERGE  (i:Iteration {name: '$iterationName'})-[:IS_ITERATION_OF]->(p)
+						  SET 	 i.begin = $begin,
+						  		 i.end = $end
+						  
+						  MERGE (f)-[:BELONGS_TO]->(i) ";
+				//echo $query."\n\n";
+				runQuery($client, $query);
 			}
-
-
-			if (!$atLeastOne) {
-				runQuery($client, "MERGE (p:Project {name: '$repoName'})
-									CREATE (i:Iteration {name: '$iterationName', begin: $begin, end: $end})
-									-[:IS_ITERATION_OF]->(p)"
-						);
-			}
-
 
 			echo "\n\n\nDone.\n\n";
 			$timestamp_iteration = microtime(TRUE) - $timestamp_iteration;
@@ -381,10 +372,10 @@
 									name: '$serviceName', 
 									url:  '$serviceUrl'
 								})
-								CREATE UNIQUE (p)-[:DEPENDS_ON {
-									version: '$serviceVersion'
-								}]->(s)
-							 ";
+								MERGE (p)-[rel:DEPENDS_ON]->(s)
+								SET rel.version = '$serviceVersion'
+								";
+							 
 
 					runQuery($client, $query);
 				}
@@ -393,6 +384,7 @@
 			}
 			catch (FileNotFoundException $e) {
 				print("Couldn't parse composer.lock : file doesn't exist.");
+				file_put_contents(__DIR__.'/../logs/no_composer', $repoName." \n", FILE_APPEND | LOCK_EX);
 			}
 
 			echo "\n\n\nDone.\n\n";
