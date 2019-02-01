@@ -1,19 +1,31 @@
 
 <?php
 
+	error_reporting(E_ALL);
+	$timestamp_full = microtime(TRUE);
+
+	require_once __DIR__.'/../objects/Crawler.php';
+	require_once __DIR__.'/../objects/Date.php';
+	require_once __DIR__.'/../functions/common_functions.php';
+
+	require __DIR__.'/../vendor/autoload.php';
+
+
 
 
 	chdir(__DIR__."/../data/projects");
 
 	$dirs = scandir('.');
+	print_r($dirs);
 	foreach ($dirs as $item) {
 
-		if (!is_dir($item)) continue;
+		if (!is_dir($item) || in_array($item, ['.', '..'])) continue;
 
 
 		$project = $item;
 		$repository = realpath(__DIR__."/../data/projects/$project");
 		$repoName = getRepoName($repository);
+		echo "$repository : $repoName\n";
 		$iterationName = 'initialisation';
 		$iterationBegin = Date::buildDateFromTimestamp(0);
 		$iterationEnd 	= Date::buildDateFromAmericanFormat(date('Y-m-d'), date('H:i'));

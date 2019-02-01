@@ -75,15 +75,19 @@ RETURN DISTINCT feature.name AS feature
 
 
 Get which Projects use a service
+
 MATCH (s:Service)<-[dp:DEPENDS_ON]-(p:Project)
 WHERE s.name = 'fei/api-client'
-RETURN p.name as project, dp.version as used_version
+RETURN p.name as project, dp.version as used_version 
+ORDER BY project ASC
 
 
+Get which services are used by a project
 
-
-
-
+MATCH (s:Service)<-[dp:DEPENDS_ON]-(p:Project)
+WHERE p.name = 'alerts'
+RETURN s.name as service, dp.version as used_version 
+ORDER BY service ASC
 
 
 

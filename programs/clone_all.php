@@ -20,7 +20,7 @@
 
 
 
-	$token = "61fb3bd985ca5c3efbf09b0136bec7abe8066cc8";
+	$token = "df1b45675565448738efbb6f8fcc6f4857193e8f";
 	
 	$res1 = $client->request('GET', '/orgs/flash-global/repos?per_page=100', [
 							'auth' => ['WustmannMatthias', $token],
