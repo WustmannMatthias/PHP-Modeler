@@ -59,7 +59,9 @@
 
 
 	//Run query 
+	$timestampQuery = microtime(TRUE);
 	$result = $client->run($query);
+	$queryRunningTime = microtime(TRUE) - $timestampQuery;
 
 
 	//prepare output array
@@ -75,8 +77,10 @@
 		$counter ++;
 	}
 	
-
-	echo json_encode($json);
+	$output = array();
+	$output['duration'] = $queryRunningTime;
+	$output['result']	= $json;
+	echo json_encode($output);
 	exit();
 
 ?>

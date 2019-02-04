@@ -119,48 +119,60 @@ function queryDb() {
 
 
 function displayData(data) {
-	if (!data.length) {
-		data = [data];
-	}
-	console.log(typeof data[0]);
-	console.log(data);
+	var duration = data.duration;
+	console.log(duration);
+	delete data.duration;
 
-	var html = "";
-	if (data.length == 0) {
-		html = "<p>No results.</p>";
+	result = data.result;
+	if (!result.length) {
+		result = [result];
+	}
+	console.log(typeof result[0]);
+	console.log(result);
+
+	var table = "";
+	if (result.length == 0) {
+		table = "<p>No results.</p>";
 	}
 	else {
-		html += "<table class='table table-bordered table-striped table-hover'>";
+		table += "<table class='table table-bordered table-striped table-hover'>";
 
 		//header
-		html += "<thead class=''>";
-		var keys = Object.keys(data[0]);
-		html += "<tr class='table-info'>";
-		html += "<th scope='col'>#</th>";
+		table += "<thead class=''>";
+		var keys = Object.keys(result[0]);
+		table += "<tr class='table-info'>";
+		table += "<th scope='col'>#</th>";
 		for (let i = 0; i < keys.length; i++) {
-			html += "<th>" + keys[i] + "</th>";
+			table += "<th>" + keys[i] + "</th>";
 		}
-		html += "</tr>"; 
-		html += "</thead>";
+		table += "</tr>"; 
+		table += "</thead>";
 
 
 		//body
-		html += "<tbody>";		
-		for (let i = 0; i < data.length; i++) {
-			html += "<tr>";
-			html += "<th scope='row'>" + (i + 1) + "</th>";
-			for (key in data[i]) {
-				if (data[i].hasOwnProperty(key)) {
-					html += "<td>";
-					html += data[i][key];
-					html += "</td>";
+		table += "<tbody>";		
+		for (let i = 0; i < result.length; i++) {
+			table += "<tr>";
+			table += "<th scope='row'>" + (i + 1) + "</th>";
+			for (key in result[i]) {
+				if (result[i].hasOwnProperty(key)) {
+					table += "<td>";
+					table += result[i][key];
+					table += "</td>";
 				}
 			}
-			html += "</tr>";
+			table += "</tr>";
 		}
-		html += "</tbody>";
+		table += "</tbody>";
 
-		html += "</table>";
+		table += "</table>";
+
+		var p = "<p>";
+		p += "Running time : " + duration.toPrecision(3) + " seconds.";
+		p += "</p>";
+
+		var html = p + table
+
 	}
 
 	$('#query_result').html(html);
