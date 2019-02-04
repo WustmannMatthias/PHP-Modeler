@@ -17,15 +17,15 @@
 
 	$dirs = scandir('.');
 	print_r($dirs);
+	$counter = 0;
 	foreach ($dirs as $item) {
-
 		if (!is_dir($item) || in_array($item, ['.', '..'])) continue;
-
+		$counter ++;
 
 		$project = $item;
 		$repository = realpath(__DIR__."/../data/projects/$project");
 		$repoName = getRepoName($repository);
-		echo "$repository : $repoName\n";
+		echo "$counter -> $repository : $repoName\n";
 		$iterationName = 'initialisation';
 		$iterationBegin = Date::buildDateFromTimestamp(0);
 		$iterationEnd 	= Date::buildDateFromAmericanFormat(date('Y-m-d'), date('H:i'));

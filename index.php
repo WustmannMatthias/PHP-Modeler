@@ -1,7 +1,7 @@
 <?php
 	session_start();
 
-	foreach(parse_ini_file('data/general_settings/database') 
+	foreach (parse_ini_file('data/general_settings/database') 
 		as $key => $value) {
 		$_SESSION[$key] = $value;	
 	}
@@ -42,6 +42,9 @@
 							}
 							else if (isset($_GET['features'])) {
 								include "frames/features.php";
+							}
+							else if (isset($_GET['packages'])) {
+								include "frames/packages.php";
 							}
 							else {
 								echo "404 not found";

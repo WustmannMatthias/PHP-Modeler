@@ -371,11 +371,11 @@
 
 
 					$query = "	MATCH (p:Project {name: '$repoName'})
-								MERGE (s:Service {
+								MERGE (pck:Package {
 									name: '$serviceName', 
 									url:  '$serviceUrl'
 								})
-								MERGE (p)-[rel:DEPENDS_ON]->(s)
+								MERGE (p)-[rel:DEPENDS_ON]->(pck)
 								SET rel.version = '$serviceVersion'
 								";
 							 

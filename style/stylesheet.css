@@ -60,13 +60,18 @@ input[type="text"], input[type="time"], input[type="date"], select {
 }
 
 
+.packages_row {
+	margin-top: 80px;
+}
 
 
+.query_select:hover {
+	cursor: pointer;
+}
 
-
-
-
-
+.query_select li:hover {
+	background-color: #F3F3F3;
+}
 
 
 
