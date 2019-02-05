@@ -26,7 +26,7 @@
 		$repository = realpath(__DIR__."/../data/projects/$project");
 		$repoName = getRepoName($repository);
 		echo "$counter -> $repository : $repoName\n";
-		$iterationName = 'initialisation';
+		$iterationName = 'initialisation05-02-2019';
 		$iterationBegin = Date::buildDateFromTimestamp(0);
 		$iterationEnd 	= Date::buildDateFromAmericanFormat(date('Y-m-d'), date('H:i'));
 		$extensions = array('php');
