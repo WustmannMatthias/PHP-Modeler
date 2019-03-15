@@ -70,6 +70,16 @@ RETURN DISTINCT feature.name AS feature
 
 
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! GET ALL FILES IMPACTED BY A GIVEN FILE !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+MATCH (file:File)-[:IS_INCLUDED_IN|:IS_REQUIRED_IN|:IS_USED_BY|:DECLARES*1..10]->(f:File)
+WHERE file.repository = '$repo'
+AND file.path = '$path'
+RETURN DISTINCT f.path as file
+
+
 
 
 
