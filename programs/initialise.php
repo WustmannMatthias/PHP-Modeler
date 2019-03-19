@@ -26,10 +26,10 @@
 		$repository = realpath(__DIR__."/../data/projects/$project");
 		$repoName = getRepoName($repository);
 		echo "$counter -> $repository : $repoName\n";
-		$iterationName = 'initialisation05-02-2019';
+		$iterationName = 'initialisation';
 		$iterationBegin = Date::buildDateFromTimestamp(0);
 		$iterationEnd 	= Date::buildDateFromAmericanFormat(date('Y-m-d'), date('H:i'));
-		$extensions = array('php');
+		$extensions = array('php', 'inc');
 		$noExtensionFiles = False;
 		$featureSyntax = "@feature";
 		$subDirectoriesToIgnore = array('.git');
@@ -42,17 +42,17 @@
 		$password = $settings['PASSWORD'];
 
 
-		$crawler = new Crawler($repository, $repoName, $iterationName, $iterationBegin, $iterationEnd, $extensions, $noExtensionFiles, $featureSyntax, 
+		$crawler = new Crawler($repository, $repoName, $iterationName, $iterationBegin, $iterationEnd, $extensions, $noExtensionFiles, $featureSyntax,
 								$subDirectoriesToIgnore, $filesToIgnore, $databaseURL, $databasePort, $username, $password);
 
 
 		$crawler->crawl();
 		echo "\n\n\n\n\n\n";
-		
+
 	}
 
 	echo "\n\n\n";
-	
+
 	echo "Program successfully completed.\n";
 
 

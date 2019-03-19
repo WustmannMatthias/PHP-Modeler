@@ -15,6 +15,16 @@
 												ORDER BY package ASC",
 								"params" => array("project" => "list"),
 								"return" => array("package", "used_version")
+							),
+					
+					'3' => //Get all files dépending of a given file
+							array("query" => "MATCH (file:File)-[:IS_INCLUDED_IN|:IS_REQUIRED_IN|:IS_USED_BY|:DECLARES*1..10]->(f:File)
+												WHERE file.repository = '\$repo'
+												AND file.path = '\$path'
+												RETURN DISTINCT f.path as file",
+								"params" => array("repo" => "string", "path" => "string"),
+								"return" => array("file")
 							)
 					);
+					
 ?>
