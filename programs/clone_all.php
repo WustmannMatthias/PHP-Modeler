@@ -1,5 +1,5 @@
 <?php
-	
+
 	error_reporting(E_ALL);
 	$timestamp_full = microtime(TRUE);
 
@@ -18,10 +18,6 @@
 
 
 
-
-
-	$token = "df1b45675565448738efbb6f8fcc6f4857193e8f";
-	
 	$res1 = $client->request('GET', '/orgs/flash-global/repos?per_page=100', [
 							'auth' => ['WustmannMatthias', $token],
 							'Accept' => 'application/vnd.github.v3+json'
@@ -58,7 +54,7 @@
 	foreach ($data1 as $repo) {
 		$sshUrls[$repo->name] = $repo->ssh_url;
 	}
-	
+
 	foreach ($data2 as $repo) {
 		$sshUrls[$repo->name] = $repo->ssh_url;
 	}
@@ -70,14 +66,14 @@
 
 
 
-	
+
 	chdir(__DIR__."/../data/projects");
 	foreach ($sshUrls as $name => $url) {
 		/**
 		 *	Once we got the ssh urls, let's clone every repo and install dependencies
 		 */
 		passthru('git clone '.$url, $output);
-		
+
 		/*
 		if (in_array('composer.json', scandir($name))) {
 			chdir($name);
@@ -85,12 +81,12 @@
 			chdir('..');
 		}
 		*/
-		
+
 	}
 
 
 	echo "\n\n\n";
-	
+
 	echo "Program successfully completed.\n";
 
 ?>
